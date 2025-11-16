@@ -117,7 +117,7 @@
       </div>
       <div class="note" id="status">請輸入生日（支援民國／西元）。</div>
     </div>
-    <div class="footer">v1.3.1-lite (Scheme A) · Build 2025-11-16 10:18</div>
+    <div class="footer">v1.3.2-lite (Scheme A) · Build 2025-11-16 11:12</div>
   </div>
 </div>
 
@@ -161,14 +161,18 @@
     fillDD(Y,M);
   }
 
+  function bind(el, handler){
+    ['input','change'].forEach(evt => el.addEventListener(evt, handler));
+  }
+
   mode.addEventListener('change', ()=>{ 
     if(mode.value==='roc'){ ROC_WRAP.style.display='block'; YY_WRAP.style.display='none'; }
     else { ROC_WRAP.style.display='none'; YY_WRAP.style.display='block'; }
-    compute();
+    refreshDD(); compute();
   });
   mode.dispatchEvent(new Event('change'));
 
-  [roc,yy,mm,dd,algo,twins,hh,mi].forEach(el=> el.addEventListener('input', ()=>{ if(el===mm||el===yy||el===roc) refreshDD(); compute(); } ));
+  [roc,yy,mm,dd,algo,twins,hh,mi].forEach(el=> bind(el, ()=>{ if(el===mm||el===yy||el===roc) refreshDD(); compute(); } ));
 
   function compute(){
     const Y = getYear();
