@@ -117,7 +117,7 @@
       </div>
       <div class="note" id="status">請輸入生日（支援民國／西元）。</div>
     </div>
-    <div class="footer">v1.3.2-lite (Scheme A) · Build 2025-11-16 11:12</div>
+    <div class="footer">v1.3.3-lite (Scheme A) · Build 2025-11-16 11:29</div>
   </div>
 </div>
 
@@ -144,7 +144,10 @@
   function fillDD(y,m){ 
     if(!y||!m){ dd.innerHTML='<option value="">—</option>'; return; }
     const dmax = daysInMonth(y,m);
+    const old = dd.value;
     dd.innerHTML = '<option value="">—</option>' + Array.from({length:dmax},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+    // keep previous day if still valid
+    if(old && parseInt(old,10) <= dmax) dd.value = old;
   }
   function fillHH(){ hh.innerHTML = '<option value="">—</option>' + Array.from({length:24},(_,i)=>`<option value="${i}">${i}</option>`).join(''); }
   function fillMI(){ mi.innerHTML = '<option value="">—</option>' + Array.from({length:60},(_,i)=>`<option value="${i}">${i}</option>`).join(''); }
@@ -161,9 +164,7 @@
     fillDD(Y,M);
   }
 
-  function bind(el, handler){
-    ['input','change'].forEach(evt => el.addEventListener(evt, handler));
-  }
+  function bind(el, handler){ ['input','change','click','blur'].forEach(evt => el.addEventListener(evt, handler)); }
 
   mode.addEventListener('change', ()=>{ 
     if(mode.value==='roc'){ ROC_WRAP.style.display='block'; YY_WRAP.style.display='none'; }
@@ -172,7 +173,16 @@
   });
   mode.dispatchEvent(new Event('change'));
 
+  // robust listeners
   [roc,yy,mm,dd,algo,twins,hh,mi].forEach(el=> bind(el, ()=>{ if(el===mm||el===yy||el===roc) refreshDD(); compute(); } ));
+
+  // polling fallback：針對某些瀏覽器事件不觸發
+  let lastKey = '';
+  setInterval(()=>{
+    const Y = getYear() || 0; const M = parseInt(mm.value||'0',10)||0;
+    const key = Y + '-' + M + '-' + (dd.options.length);
+    if(key !== lastKey){ refreshDD(); compute(); lastKey = key; }
+  }, 500);  // 每 0.5 秒檢查一次（很輕量）
 
   function compute(){
     const Y = getYear();
