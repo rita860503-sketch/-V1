@@ -51,59 +51,45 @@
     <div class="box span2"><div class="k">表象系統 (D)</div><div class="v" id="fd">—</div><div class="d" id="fd_t"></div></div>
     <div class="box span2"><div class="k">小宇宙 (E)</div><div class="v" id="fe">—</div><div class="d" id="fe_t"></div></div>
   </div>
-  <div class="note" id="status">請輸入生日（支援民國／西元）。</div>
+  <div class="note" id="status">請輸入生日（年/月/日）。</div>
 </div>
-<div class="footer">v1.3.5-lite (Scheme A) · Build NOW</div>
+<div class="footer">v1.3.6-lite (Scheme A)</div>
 </div>
 <script>
-(function(){{'use strict';
+(function(){'use strict';
   const $=s=>document.querySelector(s);
   const mode=$('#mode'),roc=$('#roc'),yy=$('#yy'),mm=$('#mm'),dd=$('#dd'),algo=$('#algo'),tw=$('#twins'),hh=$('#hh'),mi=$('#mi');
   const fa=$('#fa'),fb=$('#fb'),fc=$('#fc'),fd=$('#fd'),fe=$('#fe'),fat=$('#fa_t'),fbt=$('#fb_t'),fct=$('#fc_t'),fdt=$('#fd_t'),fet=$('#fe_t'),status=$('#status');
   const KEYWORDS=['源初','開創','合作','創意','穩定','變動','責任','覺察','權能','完成'];
-  function pad2(n){{return String(n).padStart(2,'0')}}
-  function sumDigits(n){{return String(n).split('').reduce((a,c)=>a+(+c),0)}}
-  function daysInMonth(y,m){{return new Date(y,m,0).getDate()}}
-  function fillMM(){{mm.innerHTML='<option value="">—</option>'+Array.from({{length:12}},(_,i)=>`<option value="${{i+1}}">${{i+1}}</option>`).join('')}}
-  function fillDDGeneric(m){{const map={{1:31,2:29,3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31}};const max=map[m]||0;
-    dd.innerHTML=max?('<option value="">—</option>'+Array.from({{length:max}},(_,i)=>`<option value="${{i+1}}">${{i+1}}</option>`).join('')):'<option value="">—</option>'}}
-  function refineDDWithYear(y,m){{if(!y||!m)return;const max=daysInMonth(y,m),cur=dd.value;
-    const html='<option value="">—</option>'+Array.from({{length:max}},(_,i)=>`<option value="${{i+1}}">${{i+1}}</option>`).join('');
-    if(dd.innerHTML!==html)dd.innerHTML=html; if(cur&&parseInt(cur,10)<=max)dd.value=cur;}}
-  function fillHH(){{hh.innerHTML='<option value="">—</option>'+Array.from({{length:24}},(_,i)=>`<option value="${{i}}">${{i}}</option>`).join('')}}
-  function fillMI(){{mi.innerHTML='<option value="">—</option>'+Array.from({{length:60}},(_,i)=>`<option value="${{i}}">${{i}}</option>`).join('')}}
+  function pad2(n){return String(n).padStart(2,'0')}
+  function sumDigits(n){return String(n).split('').reduce((a,c)=>a+(+c),0)}
+  function daysInMonth(y,m){return new Date(y,m,0).getDate()}
+  function fillMM(){mm.innerHTML='<option value="">—</option>'+Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
+  function fillDDGeneric(m){const map={1:31,2:29,3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31};const max=map[m]||0;
+    dd.innerHTML=max?('<option value="">—</option>'+Array.from({length:max},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')):'<option value="">—</option>'}
+  function refineDDWithYear(y,m){if(!y||!m)return;const max=daysInMonth(y,m),cur=dd.value;
+    const html='<option value="">—</option>'+Array.from({length:max},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+    if(dd.innerHTML!==html)dd.innerHTML=html; if(cur&&parseInt(cur,10)<=max)dd.value=cur;}
+  function fillHH(){hh.innerHTML='<option value="">—</option>'+Array.from({length:24},(_,i)=>`<option value="${i}">${i}</option>`).join('')}
+  function fillMI(){mi.innerHTML='<option value="">—</option>'+Array.from({length:60},(_,i)=>`<option value="${i}">${i}</option>`).join('')}
   fillMM();fillHH();fillMI();
   const ROC_WRAP=document.getElementById('roc_wrap'),YY_WRAP=document.getElementById('yy_wrap');
-  function getYear(){{if(mode.value==='roc'){{const rv=parseInt(roc.value,10);return isNaN(rv)?null:rv+1911}}const yv=parseInt(yy.value,10);return isNaN(yv)?null:yv}}
-  function compute(){{const Y=getYear(),M=parseInt(mm.value,10),D=parseInt(dd.value,10);
-    if(!(Y&&M&&D)){{setResult();status.textContent='請輸入生日（年/月/日）。';return}}
+  function getYear(){if(mode.value==='roc'){const rv=parseInt(roc.value,10);return isNaN(rv)?null:rv+1911}const yv=parseInt(yy.value,10);return isNaN(yv)?null:yv}
+  function compute(){const Y=getYear(),M=parseInt(mm.value,10),D=parseInt(dd.value,10);
+    if(!(Y&&M&&D)){setResult();status.textContent='請輸入生日（年/月/日）。';return}
     const A=Math.floor((Y%100)/10)|0,B=(Y%10),ex=((Y>=1910&&Y<=1921)||(Y>=2010&&Y<=2021)),C=ex?10:(A+B);
-    let Sum; if(algo.value==='component_sum'){{let N=Y+M+D;if(tw.value==='yes'){{const H=parseInt(hh.value,10),I=parseInt(mi.value,10);if(Number.isFinite(H)&&Number.isFinite(I))N+=H+I}}Sum=sumDigits(N)}}else{{Sum=sumDigits(Y)+sumDigits(pad2(M))+sumDigits(pad2(D))}}
+    let Sum; if(algo.value==='component_sum'){let N=Y+M+D;if(tw.value==='yes'){const H=parseInt(hh.value,10),I=parseInt(mi.value,10);if(Number.isFinite(H)&&Number.isFinite(I))N+=H+I}Sum=sumDigits(N)}else{Sum=sumDigits(Y)+sumDigits(pad2(M))+sumDigits(pad2(D))}
     const Dv=(Sum<22)?Sum:(Sum-22),Ev=(Sum<22)?Sum:sumDigits(Sum),kw=n=>KEYWORDS[Math.abs(n)%10];
     fa.textContent=ex?'—':A;fb.textContent=ex?'—':B;fc.textContent=C;fd.textContent=Dv;fe.textContent=Ev;
     fat.textContent=ex?'':A+'｜'+kw(A);fbt.textContent=ex?'':B+'｜'+kw(B);fct.textContent=(C%10)+'｜'+kw(C);fdt.textContent=(Dv%10)+'｜'+kw(Dv);fet.textContent=(Ev%10)+'｜'+kw(Ev);
-    status.textContent=ex?'例外年段：1910–1921 / 2010–2021，A/B 隱藏，C 固定 10。':'完成計算。'}}
-  function setResult(){{['fa','fb','fc','fd','fe'].forEach(id=>document.getElementById(id).textContent='—');['fa_t','fb_t','fc_t','fd_t','fe_t'].forEach(id=>{{const el=document.getElementById(id);if(el)el.textContent=''}})}}
-  function bind(el,h){{['input','change','click','blur'].forEach(e=>el.addEventListener(e,h))}}
-  mode.addEventListener('change',()=>{{if(mode.value==='roc'){{ROC_WRAP.style.display='block';YY_WRAP.style.display='none'}}else{{ROC_WRAP.style.display='none';YY_WRAP.style.display='block'}}refineDDWithYear(getYear(),parseInt(mm.value,10));compute()}});
-  bind(mm,()=>{{const M=parseInt(mm.value,10);fillDDGeneric(M);refineDDWithYear(getYear(),M);compute()}});
-  [roc,yy,dd,algo,tw,hh,mi].forEach(el=>bind(el,()=>{{refineDDWithYear(getYear(),parseInt(mm.value,10));compute()}}));
+    status.textContent=ex?'例外年段：1910–1921 / 2010–2021，A/B 隱藏，C 固定 10。':'完成計算。'}
+  function setResult(){['fa','fb','fc','fd','fe'].forEach(id=>document.getElementById(id).textContent='—');['fa_t','fb_t','fc_t','fd_t','fe_t'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=''})}
+  function bind(el,h){['input','change','click','blur'].forEach(e=>el.addEventListener(e,h))}
+  mode.addEventListener('change',()=>{if(mode.value==='roc'){ROC_WRAP.style.display='block';YY_WRAP.style.display='none';yy.value=''}else{ROC_WRAP.style.display='none';YY_WRAP.style.display='block';roc.value=''}refineDDWithYear(getYear(),parseInt(mm.value,10));compute()});
+  bind(mm,()=>{const M=parseInt(mm.value,10);fillDDGeneric(M);refineDDWithYear(getYear(),M);
+    if(dd.options.length>1 && !dd.value){dd.value = dd.options[1].value;}
+    compute()});
+  [roc,yy,dd,algo,tw,hh,mi].forEach(el=>bind(el,()=>{refineDDWithYear(getYear(),parseInt(mm.value,10));compute()}));
   mode.dispatchEvent(new Event('change')); fillDDGeneric(null);
-
-  function getTextFull(){{return `A(前世)：${{fa.textContent}}\nB(今生)：${{fb.textContent}}\nC(潛意識)：${{fc.textContent}}\nD(表象系統)：${{fd.textContent}}\nE(小宇宙)：${{fe.textContent}}`; }}
-  function getTextRaw(){{return [fa.textContent,fb.textContent,fc.textContent,fd.textContent,fe.textContent].join(',');}}
-
-  async function copyUniversal(text){{ 
-    try{{ if(navigator.clipboard && window.isSecureContext){{ await navigator.clipboard.writeText(text); status.textContent='已複製到剪貼簿。'; return true; }} }}catch(_){}
-    try{{ const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta);
-         ta.select(); ta.setSelectionRange(0, ta.value.length); const ok=document.execCommand('copy'); document.body.removeChild(ta);
-         if(ok){{ status.textContent='已複製到剪貼簿。'; return true; }} }}catch(_){}
-    try{{ const range=document.createRange(); const grid=document.querySelector('.grid'); range.selectNodeContents(grid); const sel=window.getSelection();
-         sel.removeAllRanges(); sel.addRange(range); }}catch(_){}
-    status.textContent='無法自動複製，請按鍵盤 Ctrl/⌘ + C（或手機長按）複製選取的內容。'; return false;
-  }}
-
-  document.getElementById('copy').addEventListener('click',()=>copyUniversal(getTextFull()));
-  document.getElementById('copyRaw').addEventListener('click',()=>copyUniversal(getTextRaw()));
-}})();
+})();
 </script></body></html>
