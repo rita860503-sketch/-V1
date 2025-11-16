@@ -13,7 +13,7 @@
   .wrap{max-width:1080px;margin:0 auto;padding:20px}
   .panel{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(125,211,252,.25);border-radius:18px;padding:14px;backdrop-filter:blur(2px)}
   label{font-size:13px;color:#cfe6ff;display:block;margin-bottom:6px}
-  input,select,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.25);background:#0a1a36;color:#eaf2ff;font-size:16px}
+  input,select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.25);background:#0a1a36;color:#eaf2ff;font-size:16px}
   .row{display:grid;gap:10px}@media(min-width:960px){.row6{grid-template-columns:repeat(6,1fr)}}
   .grid{display:grid;gap:14px;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(120px,auto)}.span2{grid-column:1/3}
   .box{background:linear-gradient(180deg,var(--cardBlue1),var(--cardBlue2));border:1px solid var(--cardBorder);border-radius:16px;padding:18px;
@@ -23,19 +23,17 @@
   .v{color:#fff;font-size:48px;font-weight:900;line-height:1.05;margin:2px 0 4px;text-shadow:0 0 12px rgba(255,255,255,.45),0 0 30px rgba(56,189,248,.45),0 0 66px rgba(29,78,216,.45)}
   .d{color:#e0eaff;font-size:13px;opacity:.95}
   .note{margin-top:10px;color:#cde5ff;font-size:13px}
-  .btn{cursor:pointer;background:#3b82f6;border:none;color:#fff}
-  .btn2{cursor:pointer;background:#64748b;border:none;color:#fff}
   .smallRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .footer{margin-top:14px;font-size:12px;color:#a6c8ff;text-align:center;opacity:.9}
 </style></head><body>
 <div class="wrap"><h1>瑪雅密碼計算器｜Cosmic Lite</h1><div class="panel">
 <div class="smallRow" style="margin-bottom:10px">
   <label style="display:flex;gap:8px;align-items:center;"><input id="autoToday" type="checkbox" checked style="width:auto">自動帶入今天</label>
-  <button id="fillToday" class="btn2" style="width:auto;padding:8px 12px">一鍵填入今天</button>
+  <button id="fillToday" style="width:auto;padding:8px 12px;border-radius:10px;border:1px solid rgba(125,211,252,.25);background:#334155;color:#fff;cursor:pointer">一鍵填入今天</button>
 </div>
 <div class="row row6">
   <div><label>輸入模式</label><select id="mode"><option value="roc">民國</option><option value="greg" selected>西元</option></select></div>
-  <div id="roc_wrap"><label>民國年</label><input id="roc" type="number" min="1" max="300" placeholder="86"></div>
+  <div id="roc_wrap" style="display:none"><label>民國年</label><input id="roc" type="number" min="1" max="300" placeholder="86"></div>
   <div id="yy_wrap"><label>西元年</label><input id="yy" type="number" min="1900" max="2100" placeholder="1997"></div>
   <div><label>月份</label><select id="mm"></select></div>
   <div><label>日期</label><select id="dd"></select></div>
@@ -43,10 +41,6 @@
   <div><label>雙胞胎？</label><select id="twins"><option value="no" selected>否</option><option value="yes">是（需時分）</option></select></div>
   <div><label>時（0–23）</label><select id="hh"></select></div>
   <div><label>分（0–59）</label><select id="mi"></select></div>
-  <div style="align-self:end;display:flex;gap:8px;flex-wrap:wrap">
-    <button id="copy" class="btn">複製結果</button>
-    <button id="copyRaw" class="btn2">複製純數字</button>
-  </div>
 </div>
 <div style="margin-top:12px" class="panel">
   <div class="grid">
@@ -58,7 +52,7 @@
   </div>
   <div class="note" id="status">請輸入生日（年/月/日），或使用上方「自動帶入今天」。</div>
 </div>
-<div class="footer">v1.3.7-lite (Scheme A)</div>
+<div class="footer">v1.3.8-lite (Scheme A)</div>
 </div>
 <script>
 (function(){'use strict';
@@ -91,7 +85,16 @@
     status.textContent=ex?'例外年段：1910–1921 / 2010–2021，A/B 隱藏，C 固定 10。':'完成計算。'}
   function setResult(){['fa','fb','fc','fd','fe'].forEach(id=>document.getElementById(id).textContent='—');['fa_t','fb_t','fc_t','fd_t','fe_t'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=''})}
   function bind(el,h){['input','change','click','blur'].forEach(e=>el.addEventListener(e,h))}
-  mode.addEventListener('change',()=>{if(mode.value==='roc'){ROC_WRAP.style.display='block';YY_WRAP.style.display='none';yy.value=''}else{ROC_WRAP.style.display='none';YY_WRAP.style.display='block';roc.value=''}refineDDWithYear(getYear(),parseInt(mm.value,10));compute()});
+  mode.addEventListener('change',()=>{
+    if(mode.value==='roc'){
+      ROC_WRAP.style.display='block'; YY_WRAP.style.display='none';
+      yy.value='';
+    }else{
+      ROC_WRAP.style.display='none'; YY_WRAP.style.display='block';
+      roc.value='';
+    }
+    refineDDWithYear(getYear(),parseInt(mm.value,10)); compute();
+  });
   bind(mm,()=>{const M=parseInt(mm.value,10);fillDDGeneric(M);refineDDWithYear(getYear(),M);
     if(dd.options.length>1 && !dd.value){dd.value = dd.options[1].value;}
     compute()});
@@ -102,6 +105,6 @@
     if(!mm.value){fillDDGeneric(m);} mm.value=String(m);
     fillDDGeneric(m); refineDDWithYear(getYear(),m); dd.value=String(d);
     compute();}
-  fillBtn.addEventListener('click', fillToday);
-  if(autoToday.checked){fillToday();}
+  document.getElementById('fillToday').addEventListener('click', fillToday);
+  if(document.getElementById('autoToday').checked){fillToday();}
 })();</script></body></html>
