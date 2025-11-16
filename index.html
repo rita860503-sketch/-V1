@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>瑪雅密碼計算器｜Cosmic Lite</title>
+<meta name="description" content="輸入民國或西元生日，一鍵得到 A 前世、B 今生、C 潛意識、D 表象系統、E 小宇宙。">
+<style>
+  :root{ --bg1:#030617; --bg2:#0a1030; --nebula1:rgba(88,28,135,.28); --nebula2:rgba(16,185,129,.18); --nebula3:rgba(59,130,246,.20);
+         --txt:#eaf2ff; --cardBlue1:#1e3a8a; --cardBlue2:#0f2f7a; --cardBorder:#1d4ed8; }
+  html,body{ margin:0; color:var(--txt); font-family:"Noto Sans TC","Source Han Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,Segoe UI,Roboto,sans-serif; height:100%; }
+  body{ min-height:100vh; background:
+      radial-gradient(1000px 500px at 15% 20%, var(--nebula1), transparent 60%),
+      radial-gradient(900px 540px at 85% 25%, var(--nebula2), transparent 65%),
+      radial-gradient(800px 500px at 70% 75%, var(--nebula3), transparent 70%),
+      radial-gradient(1200px 700px at 50% -10%, var(--bg2), var(--bg1)); background-attachment:fixed,fixed,fixed,fixed; position:relative; overflow-x:hidden; }
+  .stars,.stars2,.stars3{ position: fixed; inset:0; pointer-events:none; background:transparent; }
+  .stars{ background-image:
+      radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.95) 0 2px, transparent 2.1px),
+      radial-gradient(1.6px 1.6px at 35% 35%, rgba(255,255,255,.8) 0 1.6px, transparent 2.2px),
+      radial-gradient(1.2px 1.2px at 60% 25%, rgba(255,255,255,.7) 0 1.2px, transparent 2px),
+      radial-gradient(1.8px 1.8px at 80% 45%, rgba(255,255,255,.9) 0 1.8px, transparent 2.4px);
+      animation: twA 3.2s infinite ease-in-out alternate; filter: drop-shadow(0 0 3px rgba(255,255,255,.35)); }
+  .stars2{ background-image:
+      radial-gradient(1.8px 1.8px at 25% 15%, rgba(255,255,255,.85) 0 1.8px, transparent 2.3px),
+      radial-gradient(1.2px 1.2px at 45% 70%, rgba(255,255,255,.7) 0 1.2px, transparent 2px);
+      animation: twB 4.6s infinite ease-in-out alternate-reverse; filter: drop-shadow(0 0 4px rgba(125,211,252,.45)); }
+  .stars3{ background-image:
+      radial-gradient(2.2px 2.2px at 30% 50%, rgba(255,255,255,1) 0 2.2px, transparent 2.6px),
+      radial-gradient(1.4px 1.4px at 55% 30%, rgba(255,255,255,.9) 0 1.4px, transparent 2.1px);
+      animation: twC 5.8s infinite ease-in-out alternate; filter: drop-shadow(0 0 6px rgba(59,130,246,.45)); }
+  @keyframes twA{from{opacity:.55;transform:scale(1)}to{opacity:1;transform:scale(1.02)}}
+  @keyframes twB{from{opacity:.45;transform:scale(1)}to{opacity:.95;transform:scale(1.03)}}
+  @keyframes twC{from{opacity:.40;transform:scale(1)}to{opacity:.90;transform:scale(1.05)}}
+  .wrap{ max-width:1080px; margin:0 auto; padding:20px; position:relative; z-index:1; }
+  h1{ margin:4px 0 10px; font-size:22px; font-weight:800; text-shadow:0 2px 18px rgba(125,211,252,.25); }
+  .panel{ background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid rgba(125,211,252,.25); border-radius:18px; padding:14px; backdrop-filter: blur(2px); }
+  label{ font-size:13px; color:#cfe6ff; display:block; margin-bottom:6px }
+  input,select,button{ width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(125,211,252,.25); background:#0a1a36; color:#eaf2ff; font-size:16px; }
+  .row{ display:grid; gap:10px }
+  @media (min-width:860px){ .row6{grid-template-columns: repeat(6, 1fr);} }
+  .grid{ display:grid; gap:14px; grid-template-columns:1fr 1fr; grid-auto-rows:minmax(120px,auto);}
+  .span2{ grid-column:1/3; }
+  .box{ background: linear-gradient(180deg, var(--cardBlue1), var(--cardBlue2)); border: 1px solid var(--cardBorder); border-radius: 16px; padding: 18px;
+         display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+         box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 6px 22px rgba(29,78,216,.35), 0 0 40px rgba(29,78,216,.20); }
+  .k{ color:#bfdbfe; font-weight:800; letter-spacing:.02em; font-size:13px; margin-bottom:6px }
+  .v{ color:#fff; font-size:48px; font-weight:900; line-height:1.05; margin:2px 0 4px; text-shadow: 0 0 12px rgba(255,255,255,.45), 0 0 30px rgba(56,189,248,.45), 0 0 66px rgba(29,78,216,.45); }
+  .d{ color:#e0eaff; font-size:13px; opacity:.95 }
+  .note{ margin-top:10px; color:#cde5ff; font-size:13px }
+  .btn{ cursor:pointer; background:#3b82f6; border:none; color:#fff }
+  .footer{ margin-top:14px; font-size:12px; color:#a6c8ff; text-align:center; opacity:.9 }
+</style>
+</head>
+<body>
+<div class="stars"></div><div class="stars2"></div><div class="stars3"></div>
+
+<div class="wrap">
+  <h1>瑪雅密碼計算器｜Cosmic Lite</h1>
+  <div class="panel">
+    <div class="row row6">
+      <div>
+        <label>輸入模式</label>
+        <select id="mode">
+          <option value="roc" selected>民國</option>
+          <option value="greg">西元</option>
+        </select>
+      </div>
+      <div id="roc_wrap">
+        <label>民國年</label>
+        <input id="roc" type="number" min="1" max="300" placeholder="86">
+      </div>
+      <div id="yy_wrap">
+        <label>西元年</label>
+        <input id="yy" type="number" min="1900" max="2100" placeholder="1997">
+      </div>
+      <div>
+        <label>月份</label>
+        <select id="mm"></select>
+      </div>
+      <div>
+        <label>日期</label>
+        <select id="dd"></select>
+      </div>
+      <div>
+        <label>D/E 計算法</label>
+        <select id="algo">
+          <option value="component_sum" selected>加總法（年＋月＋日[＋時＋分]）</option>
+          <option value="concat_8">八位串接法（YYYYMMDD）</option>
+        </select>
+      </div>
+      <div>
+        <label>雙胞胎？</label>
+        <select id="twins"><option value="no" selected>否</option><option value="yes">是（需時分）</option></select>
+      </div>
+      <div>
+        <label>時（0–23）</label>
+        <select id="hh"></select>
+      </div>
+      <div>
+        <label>分（0–59）</label>
+        <select id="mi"></select>
+      </div>
+      <div style="align-self:end">
+        <button id="copy" class="btn">複製結果</button>
+      </div>
+    </div>
+
+    <div style="margin-top:12px" class="panel">
+      <!-- 九宮格結果 -->
+      <div class="grid">
+        <div class="box"><div class="k">前世 (A)</div><div class="v" id="fa">—</div><div class="d" id="fa_t"></div></div>
+        <div class="box"><div class="k">今生 (B)</div><div class="v" id="fb">—</div><div class="d" id="fb_t"></div></div>
+        <div class="box span2"><div class="k">潛意識 (C)</div><div class="v" id="fc">—</div><div class="d" id="fc_t"></div></div>
+        <div class="box span2"><div class="k">表象系統 (D)</div><div class="v" id="fd">—</div><div class="d" id="fd_t"></div></div>
+        <div class="box span2"><div class="k">小宇宙 (E)</div><div class="v" id="fe">—</div><div class="d" id="fe_t"></div></div>
+      </div>
+      <div class="note" id="status">請輸入生日（支援民國／西元）。</div>
+    </div>
+    <div class="footer">v1.3.1-lite (Scheme A) · Build 2025-11-16 10:18</div>
+  </div>
+</div>
+
+<script>
+(function(){'use strict';
+  const $ = s => document.querySelector(s);
+  const mode = $('#mode'), roc = $('#roc'), yy = $('#yy');
+  const mm = $('#mm'), dd = $('#dd'), algo = $('#algo');
+  const twins = $('#twins'), hh = $('#hh'), mi = $('#mi');
+  const fa=$('#fa'), fb=$('#fb'), fc=$('#fc'), fd=$('#fd'), fe=$('#fe');
+  const fat=$('#fa_t'), fbt=$('#fb_t'), fct=$('#fc_t'), fdt=$('#fd_t'), fet=$('#fe_t');
+  const status = $('#status'); const copyBtn = $('#copy');
+
+  const ROC_WRAP = $('#roc_wrap'), YY_WRAP = $('#yy_wrap');
+
+  const KEYWORDS = ['源初','開創','合作','創意','穩定','變動','責任','覺察','權能','完成'];
+
+  function pad2(n){return String(n).padStart(2,'0');}
+  function daysInMonth(y,m){return new Date(y,m,0).getDate();}
+  function sumDigits(n){return String(n).split('').reduce((a,c)=>a+(+c),0);}
+
+  // init selects
+  function fillMM(){ mm.innerHTML = '<option value="">—</option>' + Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join(''); }
+  function fillDD(y,m){ 
+    if(!y||!m){ dd.innerHTML='<option value="">—</option>'; return; }
+    const dmax = daysInMonth(y,m);
+    dd.innerHTML = '<option value="">—</option>' + Array.from({length:dmax},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+  }
+  function fillHH(){ hh.innerHTML = '<option value="">—</option>' + Array.from({length:24},(_,i)=>`<option value="${i}">${i}</option>`).join(''); }
+  function fillMI(){ mi.innerHTML = '<option value="">—</option>' + Array.from({length:60},(_,i)=>`<option value="${i}">${i}</option>`).join(''); }
+
+  fillMM(); fillHH(); fillMI();
+
+  function getYear(){ 
+    if(mode.value==='roc'){ const rv = parseInt(roc.value,10); return isNaN(rv)? null : rv+1911; }
+    const yv = parseInt(yy.value,10); return isNaN(yv)? null : yv;
+  }
+
+  function refreshDD(){
+    const Y = getYear(); const M = parseInt(mm.value,10);
+    fillDD(Y,M);
+  }
+
+  mode.addEventListener('change', ()=>{ 
+    if(mode.value==='roc'){ ROC_WRAP.style.display='block'; YY_WRAP.style.display='none'; }
+    else { ROC_WRAP.style.display='none'; YY_WRAP.style.display='block'; }
+    compute();
+  });
+  mode.dispatchEvent(new Event('change'));
+
+  [roc,yy,mm,dd,algo,twins,hh,mi].forEach(el=> el.addEventListener('input', ()=>{ if(el===mm||el===yy||el===roc) refreshDD(); compute(); } ));
+
+  function compute(){
+    const Y = getYear();
+    const M = parseInt(mm.value,10);
+    const D = parseInt(dd.value,10);
+    const hasBasic = !!(Y && M && D);
+
+    if(!hasBasic){ setResult(null); status.textContent='請輸入生日（年/月/日）。'; return; }
+
+    const A = Math.floor(((Y % 100) / 10)) | 0;
+    const B = (Y % 10);
+    const isException = ((Y>=1910 && Y<=1921) || (Y>=2010 && Y<=2021));
+    const C = isException ? 10 : (A + B);
+
+    let Sum;
+    if(algo.value==='component_sum'){   // 加總法（年＋月＋日[＋時＋分]）
+      let N = Y + M + D;
+      if(twins.value==='yes'){
+        const H = parseInt(hh.value,10), I = parseInt(mi.value,10);
+        if(Number.isFinite(H) && Number.isFinite(I)) N += H + I;
+        else { status.textContent='雙胞胎模式需同時填入「時、分」。'; }
+      }
+      Sum = sumDigits(N);
+    } else {  // concat_8 八位串接法（YYYYMMDD）
+      Sum = sumDigits(Y) + sumDigits(pad2(M)) + sumDigits(pad2(D));
+    }
+
+    const Dv = (Sum < 22) ? Sum : (Sum - 22);
+    const Ev = (Sum < 22) ? Sum : sumDigits(Sum);
+
+    const kw = n => KEYWORDS[(Math.abs(n) % 10)];
+
+    fa.textContent = isException ? '—' : A;
+    fb.textContent = isException ? '—' : B;
+    fc.textContent = C;
+    fd.textContent = Dv;
+    fe.textContent = Ev;
+
+    fat.textContent = isException ? '' : A + '｜' + kw(A);
+    fbt.textContent = isException ? '' : B + '｜' + kw(B);
+    fct.textContent = (C%10) + '｜' + kw(C);
+    fdt.textContent = (Dv%10) + '｜' + kw(Dv);
+    fet.textContent = (Ev%10) + '｜' + kw(Ev);
+
+    status.textContent = isException ? '例外年段：1910–1921 / 2010–2021，A/B 隱藏，C 固定 10。' : '完成計算。';
+  }
+
+  function setResult(v){ ['fa','fb','fc','fd','fe'].forEach(id=>{document.getElementById(id).textContent='—';});
+                        ['fa_t','fb_t','fc_t','fd_t','fe_t'].forEach(id=>{document.getElementById(id).textContent='';}); }
+
+  function copyResult(){
+    const A = fa.textContent, B = fb.textContent, C = fc.textContent, D = fd.textContent, E = fe.textContent;
+    const t = `A(前世)：${A}\nB(今生)：${B}\nC(潛意識)：${C}\nD(表象系統)：${D}\nE(小宇宙)：${E}`;
+    navigator.clipboard.writeText(t).then(()=>{ status.textContent='已複製到剪貼簿。'; }).catch(()=>{ status.textContent='無法複製，請手動選取。'; });
+  }
+  copyBtn.addEventListener('click', copyResult);
+})();
+</script>
+</body>
+</html>
