@@ -1,6 +1,6 @@
 const $ = (q) => document.querySelector(q);
 
-// 基本節點
+// ----- UI nodes -----
 const calendarMode = $("#calendarMode");
 const adInputs = $("#adInputs");
 const rocInputs = $("#rocInputs");
@@ -8,10 +8,10 @@ const btnCalc = $("#btnCalc");
 const btnText = btnCalc.querySelector(".btn-text");
 const btnLoader = btnCalc.querySelector(".loader");
 
-// AD
+// AD input
 const dateAD = $("#dateAD");
 
-// ROC：年輸入 + 月日選擇
+// ROC input: year + month/day picker
 const rocYearInput = $("#rocYear");
 const rocMDDisplay = $("#rocMDDisplay");
 const dateROCValue = $("#dateROCValue");
@@ -24,7 +24,7 @@ twinEnable.addEventListener("change", () => {
   timeWrap.classList.toggle("hidden", !twinEnable.checked);
 });
 
-// Picker（年固定）
+// Picker modal
 const rocPicker = $("#rocPicker");
 const rocTitle = $("#rocTitle");
 const rocPrev = $("#rocPrev");
@@ -36,7 +36,7 @@ const rocDays = $("#rocDays");
 let viewYear = new Date().getFullYear();
 let viewMonth = new Date().getMonth() + 1;
 
-// 模式切換
+// Mode switch
 calendarMode.addEventListener("change", () => {
   if (calendarMode.value === "ad") {
     rocInputs.classList.add("hidden");
@@ -55,7 +55,7 @@ function clearROC(){
   dateROCValue.value = "";
 }
 
-// 點擊月日輸入 → 開 Picker（固定年）
+// Click ROC MD input to open picker
 rocMDDisplay.addEventListener("click", () => {
   const ry = parseInt(rocYearInput.value, 10);
   if (isNaN(ry) || ry <= 0) { alert("請先輸入民國年份（例如：86）。"); return; }
@@ -111,7 +111,7 @@ function selectMD(d){
   closePicker();
 }
 
-// 上/下一月（限制在該年）
+// Prev/Next (stay in year)
 rocPrev.addEventListener("click", () => { if (viewMonth === 1) return; viewMonth--; renderMonth(); });
 rocNext.addEventListener("click", () => { if (viewMonth === 12) return; viewMonth++; renderMonth(); });
 rocToday.addEventListener("click", () => {
@@ -130,11 +130,11 @@ $("#btnReset").addEventListener("click", () => {
 });
 
 function hideResult(){
-  $("#valA").textContent = "—";
-  $("#valB").textContent = "—";
-  $("#valC").textContent = "—";
-  $("#valD").textContent = "—";
-  $("#valE").textContent = "—";
+  ["A","B","C","D","E"].forEach(k=>{
+    document.querySelector("#val"+k).textContent = "—";
+    document.querySelector("#sub"+k).textContent = "—";
+  });
+  $("#doneMsg").textContent = "";
   $("#result").classList.add("hidden");
 }
 
@@ -144,12 +144,22 @@ function toggleLoading(isLoading){
   else { btnCalc.classList.remove("loading"); btnText.classList.remove("hidden"); btnLoader.classList.add("hidden"); }
 }
 
-// Digit sum
+// Digit sum & digital root
 function sumDigits(n){
   return String(Math.trunc(Number(n))).split("").reduce((a,c)=>a+(isNaN(+c)?0:+c),0);
 }
+function digitalRoot(n){
+  n = Math.abs(parseInt(n,10)||0);
+  while(n>=10){ n = String(n).split("").reduce((a,c)=>a+(+c||0),0); }
+  return n;
+}
 
-// 計算
+// Keywords 0-9
+const KEYWORDS = {
+  0:"源初",1:"創始",2:"連結",3:"溝通",4:"結構",5:"變動",6:"責任",7:"覺察",8:"力量",9:"完成"
+};
+
+// Compute
 btnCalc.addEventListener("click", () => {
   if (btnCalc.classList.contains("loading")) return;
   const date = readDate();
@@ -181,13 +191,13 @@ function readDate(){
 }
 
 function computeMaya({ y, m, d }){
-  // 準則例外：1910–1921、2010–2021
+  // Exceptions
   const isException = (y >= 1910 && y <= 1921) || (y >= 2010 && y <= 2021);
   const A_raw = Math.floor((y % 100) / 10);
   const B_raw = y % 10;
   const C = isException ? 10 : (A_raw + B_raw);
 
-  // Twins: HH+MM（若有）
+  // Twins HH+MM
   let hhmm = 0;
   if (twinEnable && twinEnable.checked && birthTime && birthTime.value){
     const [hh, mm] = birthTime.value.split(":").map(v=>parseInt(v,10));
@@ -195,7 +205,7 @@ function computeMaya({ y, m, d }){
     if (!isNaN(mm)) hhmm += mm;
   }
 
-  // N = 年 + 月 + 日 + (時+分)
+  // N = Y+M+D+(HH+MM); Sum = digit sum of N
   const N = y + m + d + hhmm;
   const Sum = sumDigits(N);
   const D = (Sum < 22) ? Sum : (Sum - 22);
@@ -210,10 +220,28 @@ function computeMaya({ y, m, d }){
 }
 
 function render(r){
+  // Main numbers
   $("#valA").textContent = r.A;
   $("#valB").textContent = r.B;
   $("#valC").textContent = r.C;
   $("#valD").textContent = r.D;
   $("#valE").textContent = r.E;
+
+  // Sub lines
+  const setSub = (id, v) => {
+    const el = document.querySelector(id);
+    if (v === "—"){ el.textContent = "—"; return; }
+    const dr = digitalRoot(v);
+    const word = KEYWORDS[dr] ?? "";
+    el.textContent = `${dr} | ${word}`;
+  };
+  setSub("#subA", r.A);
+  setSub("#subB", r.B);
+  setSub("#subC", r.C);
+  setSub("#subD", r.D);
+  setSub("#subE", r.E);
+
+  // Done
+  $("#doneMsg").textContent = "完成計算。";
   $("#result").classList.remove("hidden");
 }
