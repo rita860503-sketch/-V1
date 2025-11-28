@@ -1,110 +1,90 @@
-<!doctype html><html lang="zh-Hant"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>瑪雅密碼計算器｜Cosmic Lite</title>
-<style>
-  :root{--bg1:#030617;--bg2:#0a1030;--nebula1:rgba(88,28,135,.28);--nebula2:rgba(16,185,129,.18);--nebula3:rgba(59,130,246,.20);
-        --txt:#eaf2ff;--cardBlue1:#1e3a8a;--cardBlue2:#0f2f7a;--cardBorder:#1d4ed8}
-  html,body{margin:0;color:var(--txt);font-family:"Noto Sans TC","Source Han Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;height:100%}
-  body{min-height:100vh;background:
-      radial-gradient(1000px 500px at 15% 20%, var(--nebula1), transparent 60%),
-      radial-gradient(900px 540px at 85% 25%, var(--nebula2), transparent 65%),
-      radial-gradient(800px 500px at 70% 75%, var(--nebula3), transparent 70%),
-      radial-gradient(1200px 700px at 50% -10%, var(--bg2), var(--bg1));background-attachment:fixed,fixed,fixed,fixed}
-  .wrap{max-width:1080px;margin:0 auto;padding:20px}
-  .panel{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(125,211,252,.25);border-radius:18px;padding:14px;backdrop-filter:blur(2px)}
-  label{font-size:13px;color:#cfe6ff;display:block;margin-bottom:6px}
-  input,select{width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(125,211,252,.25);background:#0a1a36;color:#eaf2ff;font-size:16px}
-  .row{display:grid;gap:10px}@media(min-width:960px){.row6{grid-template-columns:repeat(6,1fr)}}
-  .grid{display:grid;gap:14px;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(120px,auto)}.span2{grid-column:1/3}
-  .box{background:linear-gradient(180deg,var(--cardBlue1),var(--cardBlue2));border:1px solid var(--cardBorder);border-radius:16px;padding:18px;
-       display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
-       box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),0 6px 22px rgba(29,78,216,.35),0 0 40px rgba(29,78,216,.20)}
-  .k{color:#bfdbfe;font-weight:800;letter-spacing:.02em;font-size:13px;margin-bottom:6px}
-  .v{color:#fff;font-size:48px;font-weight:900;line-height:1.05;margin:2px 0 4px;text-shadow:0 0 12px rgba(255,255,255,.45),0 0 30px rgba(56,189,248,.45),0 0 66px rgba(29,78,216,.45)}
-  .d{color:#e0eaff;font-size:13px;opacity:.95}
-  .note{margin-top:10px;color:#cde5ff;font-size:13px}
-  .smallRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .footer{margin-top:14px;font-size:12px;color:#a6c8ff;text-align:center;opacity:.9}
-</style></head><body>
-<div class="wrap"><h1>瑪雅密碼計算器｜Cosmic Lite</h1><div class="panel">
-<div class="smallRow" style="margin-bottom:10px">
-  <label style="display:flex;gap:8px;align-items:center;"><input id="autoToday" type="checkbox" checked style="width:auto">自動帶入今天</label>
-  <button id="fillToday" style="width:auto;padding:8px 12px;border-radius:10px;border:1px solid rgba(125,211,252,.25);background:#334155;color:#fff;cursor:pointer">一鍵填入今天</button>
-</div>
-<div class="row row6">
-  <div><label>輸入模式</label><select id="mode"><option value="roc">民國</option><option value="greg" selected>西元</option></select></div>
-  <div id="roc_wrap" style="display:none"><label>民國年</label><input id="roc" type="number" min="1" max="300" placeholder="86"></div>
-  <div id="yy_wrap"><label>西元年</label><input id="yy" type="number" min="1900" max="2100" placeholder="1997"></div>
-  <div><label>月份</label><select id="mm"></select></div>
-  <div><label>日期</label><select id="dd"></select></div>
-  <div><label>D/E 計算法</label><select id="algo"><option value="component_sum" selected>加總法（年＋月＋日[＋時＋分]）</option><option value="concat_8">八位串接法（YYYYMMDD）</option></select></div>
-  <div><label>雙胞胎？</label><select id="twins"><option value="no" selected>否</option><option value="yes">是（需時分）</option></select></div>
-  <div><label>時（0–23）</label><select id="hh"></select></div>
-  <div><label>分（0–59）</label><select id="mi"></select></div>
-</div>
-<div style="margin-top:12px" class="panel">
-  <div class="grid">
-    <div class="box"><div class="k">前世 (A)</div><div class="v" id="fa">—</div><div class="d" id="fa_t"></div></div>
-    <div class="box"><div class="k">今生 (B)</div><div class="v" id="fb">—</div><div class="d" id="fb_t"></div></div>
-    <div class="box span2"><div class="k">潛意識 (C)</div><div class="v" id="fc">—</div><div class="d" id="fc_t"></div></div>
-    <div class="box span2"><div class="k">表象系統 (D)</div><div class="v" id="fd">—</div><div class="d" id="fd_t"></div></div>
-    <div class="box span2"><div class="k">小宇宙 (E)</div><div class="v" id="fe">—</div><div class="d" id="fe_t"></div></div>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>瑪雅密碼計算器 Lite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="sky">
+    <div class="stars"></div>
+    <div class="twinkle"></div>
   </div>
-  <div class="note" id="status">請輸入生日（年/月/日），或使用上方「自動帶入今天」。</div>
-</div>
-<div class="footer">v1.3.8-lite (Scheme A)</div>
-</div>
-<script>
-(function(){'use strict';
-  const $=s=>document.querySelector(s);
-  const mode=$('#mode'),roc=$('#roc'),yy=$('#yy'),mm=$('#mm'),dd=$('#dd'),algo=$('#algo'),tw=$('#twins'),hh=$('#hh'),mi=$('#mi');
-  const fa=$('#fa'),fb=$('#fb'),fc=$('#fc'),fd=$('#fd'),fe=$('#fe'),fat=$('#fa_t'),fbt=$('#fb_t'),fct=$('#fc_t'),fdt=$('#fd_t'),fet=$('#fe_t'),status=$('#status');
-  const autoToday=$('#autoToday'),fillBtn=$('#fillToday');
-  const KEYWORDS=['源初','開創','合作','創意','穩定','變動','責任','覺察','權能','完成'];
-  function pad2(n){return String(n).padStart(2,'0')}
-  function sumDigits(n){return String(n).split('').reduce((a,c)=>a+(+c),0)}
-  function daysInMonth(y,m){return new Date(y,m,0).getDate()}
-  function fillMM(){mm.innerHTML='<option value="">—</option>'+Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')}
-  function fillDDGeneric(m){const map={1:31,2:29,3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31};const max=map[m]||0;
-    dd.innerHTML=max?('<option value="">—</option>'+Array.from({length:max},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('')):'<option value="">—</option>'}
-  function refineDDWithYear(y,m){if(!y||!m)return;const max=daysInMonth(y,m),cur=dd.value;
-    const html='<option value="">—</option>'+Array.from({length:max},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
-    if(dd.innerHTML!==html)dd.innerHTML=html; if(cur&&parseInt(cur,10)<=max)dd.value=cur;}
-  function fillHH(){hh.innerHTML='<option value="">—</option>'+Array.from({length:24},(_,i)=>`<option value="${i}">${i}</option>`).join('')}
-  function fillMI(){mi.innerHTML='<option value="">—</option>'+Array.from({length:60},(_,i)=>`<option value="${i}">${i}</option>`).join('')}
-  fillMM();fillHH();fillMI();
-  const ROC_WRAP=document.getElementById('roc_wrap'),YY_WRAP=document.getElementById('yy_wrap');
-  function getYear(){if(mode.value==='roc'){const rv=parseInt(roc.value,10);return isNaN(rv)?null:rv+1911}const yv=parseInt(yy.value,10);return isNaN(yv)?null:yv}
-  function compute(){const Y=getYear(),M=parseInt(mm.value,10),D=parseInt(dd.value,10);
-    if(!(Y&&M&&D)){setResult();status.textContent='請輸入生日（年/月/日）。';return}
-    const A=Math.floor((Y%100)/10)|0,B=(Y%10),ex=((Y>=1910&&Y<=1921)||(Y>=2010&&Y<=2021)),C=ex?10:(A+B);
-    let Sum; if(algo.value==='component_sum'){let N=Y+M+D;if(tw.value==='yes'){const H=parseInt(hh.value,10),I=parseInt(mi.value,10);if(Number.isFinite(H)&&Number.isFinite(I))N+=H+I}Sum=sumDigits(N)}else{Sum=sumDigits(Y)+sumDigits(pad2(M))+sumDigits(pad2(D))}
-    const Dv=(Sum<22)?Sum:(Sum-22),Ev=(Sum<22)?Sum:sumDigits(Sum),kw=n=>KEYWORDS[Math.abs(n)%10];
-    fa.textContent=ex?'—':A;fb.textContent=ex?'—':B;fc.textContent=C;fd.textContent=Dv;fe.textContent=Ev;
-    fat.textContent=ex?'':A+'｜'+kw(A);fbt.textContent=ex?'':B+'｜'+kw(B);fct.textContent=(C%10)+'｜'+kw(C);fdt.textContent=(Dv%10)+'｜'+kw(Dv);fet.textContent=(Ev%10)+'｜'+kw(Ev);
-    status.textContent=ex?'例外年段：1910–1921 / 2010–2021，A/B 隱藏，C 固定 10。':'完成計算。'}
-  function setResult(){['fa','fb','fc','fd','fe'].forEach(id=>document.getElementById(id).textContent='—');['fa_t','fb_t','fc_t','fd_t','fe_t'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=''})}
-  function bind(el,h){['input','change','click','blur'].forEach(e=>el.addEventListener(e,h))}
-  mode.addEventListener('change',()=>{
-    if(mode.value==='roc'){
-      ROC_WRAP.style.display='block'; YY_WRAP.style.display='none';
-      yy.value='';
-    }else{
-      ROC_WRAP.style.display='none'; YY_WRAP.style.display='block';
-      roc.value='';
-    }
-    refineDDWithYear(getYear(),parseInt(mm.value,10)); compute();
-  });
-  bind(mm,()=>{const M=parseInt(mm.value,10);fillDDGeneric(M);refineDDWithYear(getYear(),M);
-    if(dd.options.length>1 && !dd.value){dd.value = dd.options[1].value;}
-    compute()});
-  [roc,yy,dd,algo,tw,hh,mi].forEach(el=>bind(el,()=>{refineDDWithYear(getYear(),parseInt(mm.value,10));compute()}));
 
-  function fillToday(){const t=new Date(); const y=t.getFullYear(), m=t.getMonth()+1, d=t.getDate();
-    if(mode.value==='roc'){roc.value = String(y-1911); yy.value='';} else {yy.value=String(y); roc.value='';}
-    if(!mm.value){fillDDGeneric(m);} mm.value=String(m);
-    fillDDGeneric(m); refineDDWithYear(getYear(),m); dd.value=String(d);
-    compute();}
-  document.getElementById('fillToday').addEventListener('click', fillToday);
-  if(document.getElementById('autoToday').checked){fillToday();}
-})();</script></body></html>
+  <main class="container">
+    <h1>瑪雅密碼計算器 <span class="tag">Lite</span></h1>
+
+    <section class="inputs">
+      <label class="select">
+        <span>日期格式</span>
+        <select id="calendarMode" aria-label="選擇日期格式">
+          <option value="ad">西元（公曆）</option>
+          <option value="roc">民國</option>
+        </select>
+      </label>
+
+      <div id="adInputs" class="row">
+        <label>
+          <span>西元生日</span>
+          <input type="date" id="dateAD" aria-label="選擇西元生日" />
+        </label>
+      </div>
+
+      <div id="rocInputs" class="row hidden">
+        <label>
+          <span>民國生日（以日曆選擇）</span>
+          <input type="date" id="dateROC" aria-label="選擇民國生日（日曆）" />
+          <small id="rocHint" class="hint"></small>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="btnCalc" class="btn">
+          <span class="btn-text">開始計算</span>
+          <span class="loader hidden"></span>
+        </button>
+        <button id="btnReset" class="btn ghost">清空</button>
+      </div>
+    </section>
+
+    <section id="result" class="result hidden">
+      <h2>運算結果</h2>
+
+      <div class="grid">
+        <div class="cell a">
+          <div class="label">前世 A</div>
+          <div class="value" id="valA">—</div>
+        </div>
+        <div class="cell b">
+          <div class="label">今生 B</div>
+          <div class="value" id="valB">—</div>
+        </div>
+        <div class="cell c">
+          <div class="label">潛意識 C</div>
+          <div class="value" id="valC">—</div>
+        </div>
+        <div class="cell d">
+          <div class="label">宇宙表象 D</div>
+          <div class="value" id="valD">—</div>
+        </div>
+        <div class="cell e">
+          <div class="label">小宇宙 E</div>
+          <div class="value" id="valE">—</div>
+        </div>
+      </div>
+
+      <div class="note" id="explain"></div>
+    </section>
+
+    <footer>
+      <small>字體：思源黑體（Noto Sans TC）｜ 僅供教學 / 研究用途</small>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
