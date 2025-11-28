@@ -10,17 +10,13 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="sky">
-    <div class="stars"></div>
-    <div class="twinkle"></div>
-    <div class="sparkles"></div>
-  </div>
+  <div class="sky"><div class="stars"></div><div class="twinkle"></div><div class="sparkles"></div></div>
 
   <main class="container">
     <h1>瑪雅密碼計算器 <span class="tag">Lite</span></h1>
 
     <section class="inputs">
-      <p id="birthHint" class="helper">請輸入（或選擇）自己的出生年月日</p>
+      <p class="helper">請輸入（或選擇）自己的出生年月日</p>
 
       <label class="select">
         <span>日期格式</span>
@@ -30,24 +26,33 @@
         </select>
       </label>
 
-      <!-- AD: 原生日曆 -->
       <div id="adInputs" class="row">
         <label>
           <span>西元生日</span>
-          <input type="date" id="dateAD" aria-label="選擇西元生日" aria-describedby="birthHint" />
+          <input type="date" id="dateAD" aria-label="選擇西元生日" />
         </label>
       </div>
 
-      <!-- ROC: 年用輸入、月/日用日曆（年固定） -->
       <div id="rocInputs" class="row hidden">
         <label>
           <span>民國年份</span>
-          <input type="number" id="rocYear" min="1" max="300" placeholder="例如：86" aria-label="輸入民國年份" aria-describedby="birthHint" />
+          <input type="number" id="rocYear" min="1" max="300" placeholder="例如：86" aria-label="輸入民國年份" />
         </label>
         <label>
           <span>民國月日</span>
-          <input type="text" id="rocMDDisplay" class="roc-display" placeholder="點此選擇月/日（民國年已輸入）" readonly aria-describedby="birthHint" />
-          <input type="hidden" id="dateROCValue" /> <!-- 存 AD ISO 值 YYYY-MM-DD -->
+          <input type="text" id="rocMDDisplay" class="roc-display" placeholder="點此選擇月/日（民國年已輸入）" readonly />
+          <input type="hidden" id="dateROCValue" />
+        </label>
+      </div>
+
+      <div class="advanced">
+        <label class="inline">
+          <input type="checkbox" id="twinEnable">
+          <span>雙胞胎分流（輸入出生時間讓結果略有差異）</span>
+        </label>
+        <label class="inline hidden" id="timeWrap">
+          <span>出生時間</span>
+          <input type="time" id="birthTime" step="60">
         </label>
       </div>
 
@@ -62,36 +67,17 @@
 
     <section id="result" class="result hidden">
       <h2>運算結果</h2>
-
       <div class="grid">
-        <div class="cell a">
-          <div class="label">前世 A</div>
-          <div class="value" id="valA">—</div>
-        </div>
-        <div class="cell b">
-          <div class="label">今生 B</div>
-          <div class="value" id="valB">—</div>
-        </div>
-        <div class="cell c">
-          <div class="label">潛意識 C</div>
-          <div class="value" id="valC">—</div>
-        </div>
-        <div class="cell d">
-          <div class="label">宇宙表象 D</div>
-          <div class="value" id="valD">—</div>
-        </div>
-        <div class="cell e">
-          <div class="label">小宇宙 E</div>
-          <div class="value" id="valE">—</div>
-        </div>
+        <div class="cell a"><div class="label">前世 A</div><div class="value" id="valA">—</div></div>
+        <div class="cell b"><div class="label">今生 B</div><div class="value" id="valB">—</div></div>
+        <div class="cell c"><div class="label">潛意識 C</div><div class="value" id="valC">—</div></div>
+        <div class="cell d"><div class="label">宇宙表象 D</div><div class="value" id="valD">—</div></div>
+        <div class="cell e"><div class="label">小宇宙 E</div><div class="value" id="valE">—</div></div>
       </div>
-
-      <!-- 解說區隱藏，不再顯示 -->
-      <div class="note hidden" id="explain"></div>
     </section>
   </main>
 
-  <!-- 民國月日 Picker（年固定） -->
+  <!-- 民國月日選擇器（年固定） -->
   <div id="rocPicker" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="rocTitle">
     <div class="modal-card">
       <div class="modal-header">
@@ -103,9 +89,7 @@
         <button class="chip" id="rocToday">今</button>
         <button class="chip ghost" id="rocClose">關閉</button>
       </div>
-      <div class="weekday">
-        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
-      </div>
+      <div class="weekday"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div>
       <div class="grid-days" id="rocDays"></div>
     </div>
   </div>

@@ -1,4 +1,3 @@
-// 工具
 const $ = (q) => document.querySelector(q);
 
 // 基本節點
@@ -15,7 +14,15 @@ const dateAD = $("#dateAD");
 // ROC：年輸入 + 月日選擇
 const rocYearInput = $("#rocYear");
 const rocMDDisplay = $("#rocMDDisplay");
-const dateROCValue = $("#dateROCValue"); // AD ISO yyyy-mm-dd
+const dateROCValue = $("#dateROCValue");
+
+// Twins
+const twinEnable = $("#twinEnable");
+const timeWrap = $("#timeWrap");
+const birthTime = $("#birthTime");
+twinEnable.addEventListener("change", () => {
+  timeWrap.classList.toggle("hidden", !twinEnable.checked);
+});
 
 // Picker（年固定）
 const rocPicker = $("#rocPicker");
@@ -52,16 +59,13 @@ function clearROC(){
 rocMDDisplay.addEventListener("click", () => {
   const ry = parseInt(rocYearInput.value, 10);
   if (isNaN(ry) || ry <= 0) { alert("請先輸入民國年份（例如：86）。"); return; }
-  viewYear = 1911 + ry; // 轉 AD 年
+  viewYear = 1911 + ry;
   const base = dateROCValue.value ? new Date(dateROCValue.value) : new Date(viewYear, new Date().getMonth(), 1);
   viewMonth = base.getMonth() + 1;
   openPicker();
 });
 
-function openPicker(){
-  rocPicker.classList.remove("hidden");
-  renderMonth();
-}
+function openPicker(){ rocPicker.classList.remove("hidden"); renderMonth(); }
 function closePicker(){ rocPicker.classList.add("hidden"); }
 
 function renderMonth(){
@@ -108,17 +112,11 @@ function selectMD(d){
 }
 
 // 上/下一月（限制在該年）
-rocPrev.addEventListener("click", () => {
-  if (viewMonth === 1) return; // 不跨年
-  viewMonth--; renderMonth();
-});
-rocNext.addEventListener("click", () => {
-  if (viewMonth === 12) return; // 不跨年
-  viewMonth++; renderMonth();
-});
+rocPrev.addEventListener("click", () => { if (viewMonth === 1) return; viewMonth--; renderMonth(); });
+rocNext.addEventListener("click", () => { if (viewMonth === 12) return; viewMonth++; renderMonth(); });
 rocToday.addEventListener("click", () => {
   const t = new Date();
-  if (t.getFullYear() !== viewYear) return; // 今天不在此年則忽略
+  if (t.getFullYear() !== viewYear) return;
   viewMonth = t.getMonth() + 1;
   renderMonth();
 });
@@ -144,6 +142,11 @@ function hideResult(){
 function toggleLoading(isLoading){
   if (isLoading){ btnCalc.classList.add("loading"); btnText.classList.add("hidden"); btnLoader.classList.remove("hidden"); }
   else { btnCalc.classList.remove("loading"); btnText.classList.remove("hidden"); btnLoader.classList.add("hidden"); }
+}
+
+// Digit sum
+function sumDigits(n){
+  return String(Math.trunc(Number(n))).split("").reduce((a,c)=>a+(isNaN(+c)?0:+c),0);
 }
 
 // 計算
@@ -172,24 +175,40 @@ function readDate(){
     if (isNaN(ry) || ry <= 0) return null;
     const v = dateROCValue.value; if(!v) return null;
     const d = new Date(v); if(isNaN(d.getTime())) return null;
-    // 強制把年替換為（1911 + 民國年），避免跨年殘值
     const adY = 1911 + ry;
-    const m = d.getMonth() + 1, day = d.getDate();
-    return { y: adY, m, d: day, roc: ry };
+    return { y: adY, m: d.getMonth()+1, d: d.getDate(), roc: ry };
   }
 }
 
-function sumDigits(n){ return String(Math.trunc(Number(n))).split("").reduce((a,c)=>a+(isNaN(+c)?0:+c),0); }
 function computeMaya({ y, m, d }){
+  // 準則例外：1910–1921、2010–2021
+  const isException = (y >= 1910 && y <= 1921) || (y >= 2010 && y <= 2021);
   const A_raw = Math.floor((y % 100) / 10);
   const B_raw = y % 10;
-  const isException = (y >= 1910 && y <= 1921) || (y >= 2010 && y <= 2021);
   const C = isException ? 10 : (A_raw + B_raw);
-  const Sum = sumDigits(y + m + d);
-  const Dv = (Sum < 22) ? Sum : (Sum - 22);
-  const Ev = (Sum < 22) ? Sum : sumDigits(Sum);
-  return { y,m,d, A: isException ? "—" : String(A_raw), B: isException ? "—" : String(B_raw), C, D:Dv, E:Ev };
+
+  // Twins: HH+MM（若有）
+  let hhmm = 0;
+  if (twinEnable && twinEnable.checked && birthTime && birthTime.value){
+    const [hh, mm] = birthTime.value.split(":").map(v=>parseInt(v,10));
+    if (!isNaN(hh)) hhmm += hh;
+    if (!isNaN(mm)) hhmm += mm;
+  }
+
+  // N = 年 + 月 + 日 + (時+分)
+  const N = y + m + d + hhmm;
+  const Sum = sumDigits(N);
+  const D = (Sum < 22) ? Sum : (Sum - 22);
+  const E = (Sum < 22) ? Sum : sumDigits(Sum);
+
+  return {
+    y,m,d,
+    A: isException ? "—" : String(A_raw),
+    B: isException ? "—" : String(B_raw),
+    C, D, E
+  };
 }
+
 function render(r){
   $("#valA").textContent = r.A;
   $("#valB").textContent = r.B;
