@@ -1,126 +1,104 @@
-/* 思源黑體 + 深藍星空基礎（強化閃爍） */
+/* 思源黑體 + 深藍星空（加強閃爍可見度） */
 :root {
-  --bg: #061022; --card: rgba(10, 18, 38, 0.72);
-  --border: rgba(255,255,255,0.12); --text: #e7ecff; --muted: #aab3d1; --accent: #7aa6ff;
-  --glow: 0 0 20px rgba(122,166,255,0.45), 0 0 50px rgba(170,120,255,0.25);
+  --bg: #061022; --card: rgba(10,18,38,.72); --border: rgba(255,255,255,.12);
+  --text:#e7ecff; --muted:#aab3d1; --accent:#7aa6ff;
+  --glow: 0 0 22px rgba(122,166,255,.55), 0 0 60px rgba(170,120,255,.28);
 }
-* { box-sizing: border-box; }
-html, body {
-  height: 100%; margin: 0; font-family: "Noto Sans TC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  color: var(--text);
+*{box-sizing:border-box}
+html,body{
+  height:100%; margin:0; font-family:"Noto Sans TC",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+  color:var(--text);
   background: radial-gradient(1200px 800px at 70% 10%, #132041 0%, #0b1430 40%, #061022 70%);
-  overflow-x: hidden;
+  overflow-x:hidden;
 }
-.sky { position: fixed; inset: 0; z-index: -2; }
-.stars, .twinkle, .sparkles { position: absolute; inset: 0; background-repeat: repeat; }
+.sky{position:fixed; inset:0; z-index:-2;}
+.stars,.twinkle,.sparkles{position:absolute; inset:0; background-repeat:repeat;}
 
-/* 基礎星點 */
-.stars {
+/* 星點更亮 */
+.stars{
   background-image:
-    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.95) 0, transparent 50%),
-    radial-gradient(1.5px 1.5px at 80% 20%, rgba(255,255,255,0.7) 0, transparent 50%),
-    radial-gradient(1.8px 1.8px at 60% 70%, rgba(255,255,255,0.85) 0, transparent 50%),
-    radial-gradient(1.2px 1.2px at 30% 80%, rgba(255,255,255,0.7) 0, transparent 50%);
-  animation: drift 60s linear infinite;
-}
-
-/* 大面積星雲 + 微呼吸閃爍 */
-.twinkle {
-  background-image:
-    radial-gradient(1200px 700px at 20% 30%, rgba(54,83,170,0.28), transparent 50%),
-    radial-gradient(900px 600px at 75% 20%, rgba(24,77,138,0.26), transparent 60%),
-    radial-gradient(800px 500px at 60% 80%, rgba(122,166,255,0.22), transparent 60%);
-  animation: twinkle 2s ease-in-out infinite alternate;
-  filter: blur(.6px);
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.98) 0, transparent 55%),
+    radial-gradient(1.6px 1.6px at 80% 20%, rgba(255,255,255,.85) 0, transparent 55%),
+    radial-gradient(2px 2px at 60% 70%, rgba(255,255,255,.95) 0, transparent 55%),
+    radial-gradient(1.3px 1.3px at 30% 80%, rgba(255,255,255,.8) 0, transparent 55%);
+  animation: drift 70s linear infinite;
 }
 
-/* 額外小星點：隨機閃爍（不規則） */
-.sparkles {
+/* 星雲微呼吸 */
+.twinkle{
   background-image:
-    radial-gradient(1.3px 1.3px at 15% 18%, rgba(255,255,255,0.9) 0, transparent 55%),
-    radial-gradient(1.1px 1.1px at 25% 75%, rgba(255,255,255,0.8) 0, transparent 55%),
-    radial-gradient(1.2px 1.2px at 55% 40%, rgba(255,255,255,0.9) 0, transparent 55%),
-    radial-gradient(1.0px 1.0px at 85% 60%, rgba(255,255,255,0.8) 0, transparent 55%),
-    radial-gradient(1.4px 1.4px at 70% 85%, rgba(255,255,255,0.95) 0, transparent 55%);
-  animation: flicker 1.6s steps(2,end) infinite;
+    radial-gradient(1200px 700px at 20% 30%, rgba(54,83,170,.35), transparent 50%),
+    radial-gradient(900px 600px at 75% 20%, rgba(24,77,138,.32), transparent 60%),
+    radial-gradient(800px 500px at 60% 80%, rgba(122,166,255,.28), transparent 60%);
+  animation: twinkle 1.6s ease-in-out infinite alternate;
+  filter: blur(.7px);
+}
+
+/* 額外小星點：明顯閃爍 */
+.sparkles{
+  background-image:
+    radial-gradient(1.3px 1.3px at 15% 18%, rgba(255,255,255,1) 0, transparent 55%),
+    radial-gradient(1.1px 1.1px at 25% 75%, rgba(255,255,255,.95) 0, transparent 55%),
+    radial-gradient(1.2px 1.2px at 55% 40%, rgba(255,255,255,1) 0, transparent 55%),
+    radial-gradient(1.0px 1.0px at 85% 60%, rgba(255,255,255,.95) 0, transparent 55%),
+    radial-gradient(1.4px 1.4px at 70% 85%, rgba(255,255,255,1) 0, transparent 55%);
+  animation: flicker 1.2s steps(2,end) infinite;
   mix-blend-mode: screen;
+  opacity: .9;
 }
 
-@keyframes drift { from { transform: translateY(0); } to { transform: translateY(-80px); } }
-@keyframes twinkle { from { opacity: .65; } to { opacity: 1; } }
-@keyframes flicker { 0%{opacity:.3} 50%{opacity:.9} 100%{opacity:.45} }
+@keyframes drift{from{transform:translateY(0)}to{transform:translateY(-80px)}}
+@keyframes twinkle{from{opacity:.55}to{opacity:1}}
+@keyframes flicker{0%{opacity:.35}40%{opacity:1}100%{opacity:.5}}
 
-.container { max-width: 960px; margin: 40px auto; padding: 16px; }
-h1 { margin: 0 0 12px; font-weight: 700; letter-spacing: .5px; text-shadow: var(--glow); }
-.tag { font-size: .7em; padding: 3px 8px; border: 1px solid var(--border); border-radius: 999px; color: var(--muted);
-  margin-left: 8px; backdrop-filter: blur(8px); }
+.container{max-width:960px;margin:40px auto;padding:16px}
+h1{margin:0 0 12px;font-weight:700;letter-spacing:.5px;text-shadow:var(--glow)}
+.tag{font-size:.7em;padding:3px 8px;border:1px solid var(--border);border-radius:999px;color:var(--muted);margin-left:8px;backdrop-filter:blur(8px)}
 
-.inputs, .result {
-  background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 18px;
-  box-shadow: 0 8px 30px rgba(0,0,0,.35); backdrop-filter: blur(6px);
-}
-.inputs .row { display: grid; grid-template-columns: 1fr; gap: 12px; }
-.inputs .row label, .select { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-.inputs input, .inputs select {
-  background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text);
-  padding: 10px 12px; border-radius: 10px; outline: none;
-}
-.inputs input:focus, .inputs select:focus { border-color: rgba(122,166,255,0.6); box-shadow: var(--glow); }
-.roc-display { cursor: pointer; }
-.helper{ margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+.inputs,.result{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.35);backdrop-filter:blur(6px)}
+.inputs .row{display:grid;grid-template-columns:1fr;gap:12px}
+.inputs .row label,.select{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.inputs input,.inputs select{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;outline:none}
+.inputs input:focus,.inputs select:focus{border-color:rgba(122,166,255,.6);box-shadow:var(--glow)}
+.roc-display{cursor:pointer}
+.helper{margin:0 0 10px;color:var(--muted);font-size:14px}
 
-.actions { display: flex; gap: 10px; margin-top: 4px; }
-.btn {
-  min-width:120px; padding: 10px 14px; border-radius: 12px;
-  background: linear-gradient(135deg, rgba(122,166,255,.25), rgba(170,120,255,.22));
-  color: var(--text); border: 1px solid var(--border); cursor: pointer;
-  transition: transform .1s, box-shadow .1s; position: relative; display: inline-flex; align-items:center; justify-content:center;
-}
-.btn:hover { transform: translateY(-1px); box-shadow: var(--glow); }
-.btn.ghost { background: transparent; }
-.btn.loading { pointer-events:none; opacity:.85; }
-.btn-text { transition: opacity .3s; }
-.loader {
-  width: 18px; height: 18px; border: 2px solid var(--text); border-top: 2px solid transparent;
-  border-radius: 50%; animation: spin .8s linear infinite; position: absolute; opacity: 0; transition: opacity .3s;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.hidden { display: none !important; }
-.btn.loading .btn-text { opacity: 0; } .btn.loading .loader { opacity: 1; }
+.actions{display:flex;gap:10px;margin-top:4px}
+.btn{min-width:120px;padding:10px 14px;border-radius:12px;background:linear-gradient(135deg,rgba(122,166,255,.25),rgba(170,120,255,.22));color:var(--text);border:1px solid var(--border);cursor:pointer;transition:transform .1s,box-shadow .1s;position:relative;display:inline-flex;align-items:center;justify-content:center}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--glow)}
+.btn.ghost{background:transparent}
+.btn.loading{pointer-events:none;opacity:.85}
+.btn-text{transition:opacity .3s}
+.loader{width:18px;height:18px;border:2px solid var(--text);border-top:2px solid transparent;border-radius:50%;animation:spin .8s linear infinite;position:absolute;opacity:0;transition:opacity .3s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none !important}
+.btn.loading .btn-text{opacity:0}.btn.loading .loader{opacity:1}
 
-.result { margin-top: 16px; }
-.grid { margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 12px; min-height: 340px; }
-.cell { border: 1px solid var(--border); border-radius: 16px; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  background: rgba(255,255,255,0.04); box-shadow: inset 0 0 30px rgba(122,166,255,0.08); }
-.cell .label { font-size: 12px; color: var(--muted); letter-spacing: .5px; }
-.cell .value { margin-top: 8px; font-size: 40px; font-weight: 700; text-align: center; text-shadow: var(--glow); }
-.cell.a { grid-area: 1/1/2/2; } .cell.b { grid-area: 1/2/2/3; } .cell.c { grid-area: 1/3/2/4; }
-.cell.d { grid-area: 2/2/3/3; } .cell.e { grid-area: 3/2/4/3; }
+.result{margin-top:16px}
+.grid{margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:12px;min-height:340px}
+.cell{border:1px solid var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,.04);box-shadow:inset 0 0 30px rgba(122,166,255,.08)}
+.cell .label{font-size:12px;color:var(--muted);letter-spacing:.5px}
+.cell .value{margin-top:8px;font-size:40px;font-weight:700;text-align:center;text-shadow:var(--glow)}
+.cell.a{grid-area:1/1/2/2}.cell.b{grid-area:1/2/2/3}.cell.c{grid-area:1/3/2/4}.cell.d{grid-area:2/2/3/3}.cell.e{grid-area:3/2/4/3}
 
-.note { margin-top: 10px; color: var(--muted); font-size: 14px; }
-
-@media (max-width: 680px) { .grid { min-height:300px; } .cell .value { font-size: 34px; } }
-
-/* 民國日曆 Modal */
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: grid; place-items: center; z-index: 50; }
-.modal-card { width: min(92vw, 420px); background: #0f1b3a; border:1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
-.modal-header { display:flex; align-items:center; justify-content:space-between; padding: 10px 12px; border-bottom: 1px solid var(--border); }
-.modal-header .title { font-weight:700; text-shadow: var(--glow); }
-.icon-btn { background: transparent; border:1px solid var(--border); color: var(--text); width:36px; height:36px; border-radius:10px; cursor:pointer; }
-.modal-subheader { display:flex; gap:8px; padding: 10px 12px; border-bottom:1px solid var(--border); }
-.chip { border:1px solid var(--border); background: rgba(255,255,255,.06); color: var(--text); border-radius: 999px; padding: 4px 10px; cursor:pointer; }
-.chip.ghost { background: transparent; }
-.weekday, .grid-days { display:grid; grid-template-columns: repeat(7,1fr); gap: 6px; padding: 10px 12px; }
-.weekday div { text-align:center; color: var(--muted); font-size: 12px; }
-.grid-days button { height:40px; border-radius: 10px; border:1px solid var(--border); background: rgba(255,255,255,.06); color: var(--text); cursor:pointer; }
-.grid-days button.muted { opacity:.5; }
-.grid-days button.today { box-shadow: var(--glow); }
-.panel { padding: 10px 12px; display:grid; grid-template-columns: repeat(4,1fr); gap:8px; }
-.panel button { height:40px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,.06); color: var(--text); cursor:pointer; }
+/* 民國月日 Picker（年固定） */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:grid;place-items:center;z-index:50}
+.modal-card{width:min(92vw,420px);background:#0f1b3a;border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border)}
+.modal-header .title{font-weight:700;text-shadow:var(--glow)}
+.icon-btn{background:transparent;border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:10px;cursor:pointer}
+.modal-subheader{display:flex;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border)}
+.chip{border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);border-radius:999px;padding:4px 10px;cursor:pointer}
+.chip.ghost{background:transparent}
+.weekday,.grid-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:10px 12px}
+.weekday div{text-align:center;color:var(--muted);font-size:12px}
+.grid-days button{height:40px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer}
+.grid-days button.muted{opacity:.5}
+.grid-days button.today{box-shadow:var(--glow)}
 
 /* 減少動態偏好 */
-@media (prefers-reduced-motion: reduce) {
-  .stars, .twinkle, .sparkles { animation-duration: 0s !important; }
-  .btn, .btn * { transition: none !important; }
-  .loader { animation-duration: 1.6s; }
+@media (prefers-reduced-motion: reduce){
+  .stars,.twinkle,.sparkles{animation-duration:0s !important}
+  .btn,.btn *{transition:none !important}
+  .loader{animation-duration:1.6s}
 }
