@@ -13,12 +13,15 @@
   <div class="sky">
     <div class="stars"></div>
     <div class="twinkle"></div>
+    <div class="sparkles"></div>
   </div>
 
   <main class="container">
     <h1>瑪雅密碼計算器 <span class="tag">Lite</span></h1>
 
     <section class="inputs">
+      <p id="birthHint" class="helper">請輸入（或選擇）自己的出生年月日</p>
+
       <label class="select">
         <span>日期格式</span>
         <select id="calendarMode" aria-label="選擇日期格式">
@@ -27,18 +30,20 @@
         </select>
       </label>
 
+      <!-- AD: 原生日曆 -->
       <div id="adInputs" class="row">
         <label>
           <span>西元生日</span>
-          <input type="date" id="dateAD" aria-label="選擇西元生日" />
+          <input type="date" id="dateAD" aria-label="選擇西元生日" aria-describedby="birthHint" />
         </label>
       </div>
 
+      <!-- ROC: 自製「民國」日曆（ROC 年顯示），點擊輸入框彈出選擇器 -->
       <div id="rocInputs" class="row hidden">
         <label>
-          <span>民國生日（以日曆選擇）</span>
-          <input type="date" id="dateROC" aria-label="選擇民國生日（日曆）" />
-          <small id="rocHint" class="hint"></small>
+          <span>民國生日</span>
+          <input type="text" id="dateROCDisplay" class="roc-display" placeholder="點此選日期（民國年）" readonly aria-describedby="birthHint" />
+          <input type="hidden" id="dateROCValue" /> <!-- 存 AD ISO 值 YYYY-MM-DD -->
         </label>
       </div>
 
@@ -79,11 +84,30 @@
 
       <div class="note" id="explain"></div>
     </section>
-
-    <footer>
-      <small>字體：思源黑體（Noto Sans TC）｜ 僅供教學 / 研究用途</small>
-    </footer>
   </main>
+
+  <!-- 民國日曆 Picker -->
+  <div id="rocPicker" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="rocTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <button class="icon-btn" id="rocPrev" aria-label="上一月">‹</button>
+        <div class="title" id="rocTitle">民國 114 年 11 月</div>
+        <button class="icon-btn" id="rocNext" aria-label="下一月">›</button>
+      </div>
+      <div class="modal-subheader">
+        <button class="chip" id="rocToday">今</button>
+        <button class="chip" id="rocYearSel">選年</button>
+        <button class="chip" id="rocMonthSel">選月</button>
+        <button class="chip ghost" id="rocClose">關閉</button>
+      </div>
+      <div class="weekday">
+        <div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div>
+      </div>
+      <div class="grid-days" id="rocDays"></div>
+      <div class="panel hidden" id="panelYear"></div>
+      <div class="panel hidden" id="panelMonth"></div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
