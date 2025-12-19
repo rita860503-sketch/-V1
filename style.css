@@ -75,3 +75,22 @@ h1{margin:0 0 10px;text-align:center;font-weight:900;letter-spacing:.06em;text-s
 .value{margin:6px 0 4px;font-size:56px;font-weight:900;line-height:1;text-shadow:var(--glow)}
 .sub{color:var(--muted)}
 .done{text-align:right;color:var(--muted);margin-top:6px}
+
+
+/* --- Mobile friendly overrides (v3) --- */
+html, body { height:auto !important; min-height:100% !important; overflow-y:auto !important; }
+.bg, #aurora, .stars { pointer-events:none !important; } /* background never blocks scroll */
+.panel { max-width: 980px; width: 92vw; margin: 56px auto !important; padding: 24px 20px !important; }
+.panel .totem { display:block; margin: 0 auto 18px auto; width: min(90vw, 620px) !important; height: auto !important; }
+/* Bigger on desktop */
+@media (min-width: 1024px){
+  .panel .totem { width: 620px !important; }
+}
+/* Phone-specific: ensure scroll & buttons are accessible */
+@media (max-width: 600px){
+  .panel { padding-bottom: 28px !important; }
+  .form-row, .controls { gap: 12px !important; }
+  .btn { min-height: 44px !important; font-size: 15px !important; }
+}
+/* small spacer to ensure page can scroll a bit at bottom */
+body::after{ content:""; display:block; height:40px; }
