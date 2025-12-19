@@ -1,46 +1,19 @@
-// 動態極光背景：Canvas + requestAnimationFrame
+// 靜態極光底（移除動態波浪，降低 GPU/CPU）
 const canvas = document.getElementById('aurora');
-const ctx = canvas.getContext('2d', { alpha: true }); // 透明背景，避免被覆蓋
-function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
-addEventListener('resize',resize,{passive:true});resize();
-let t=0;
-function drawAurora(){
-  const w=canvas.width,h=canvas.height;
+const ctx = canvas.getContext('2d', { alpha: true });
+function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; paintAurora(); }
+addEventListener('resize', resize, { passive:true });
+function paintAurora(){
+  const w = canvas.width, h = canvas.height;
+  const g = ctx.createRadialGradient(w*0.7, h*0.2, 50, w*0.5, h*0.7, Math.max(w,h));
+  g.addColorStop(0,  'rgba(20, 40, 90, 0.55)');
+  g.addColorStop(0.4,'rgba(12, 28, 64, 0.45)');
+  g.addColorStop(1,  'rgba(4, 10, 22, 0.85)');
   ctx.clearRect(0,0,w,h);
-  // 深藍色底（淡到透明，保留星空）
-  const g=ctx.createLinearGradient(0,0,0,h);
-  g.addColorStop(0,'rgba(2,4,11,0.9)');
-  g.addColorStop(1,'rgba(11,21,48,0.6)');
-  ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-
-  const bands=[
-    {hue:160,amp:.28,speed:.0007,y:.35,width:140},
-    {hue:200,amp:.22,speed:.0005,y:.55,width:160},
-    {hue:130,amp:.2 ,speed:.0004,y:.75,width:180},
-  ];
-
-  bands.forEach((b,i)=>{
-    ctx.save(); ctx.globalCompositeOperation='lighter';
-    const grad=ctx.createLinearGradient(0,b.y*h-b.width,0,b.y*h+b.width);
-    grad.addColorStop(0,`hsla(${b.hue},90%,70%,0)`);
-    grad.addColorStop(.45,`hsla(${b.hue+20},95%,70%,.35)`);
-    grad.addColorStop(1,`hsla(${b.hue+40},100%,75%,0)`);
-    ctx.fillStyle=grad;
-    ctx.beginPath();
-    ctx.moveTo(0,b.y*h);
-    for(let x=0;x<=w;x+=6){
-      const y=b.y*h
-        + Math.sin((t*b.speed*900)+x*0.01+i)*b.amp*140
-        + Math.sin((t*b.speed*2.5)+x*0.03)*b.amp*60;
-      ctx.lineTo(x,y);
-    }
-    ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();
-    ctx.fill(); ctx.restore();
-  });
-
-  t+=1; requestAnimationFrame(drawAurora);
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,w,h);
 }
-drawAurora();
+resize(); // initial paint
 
 // 計算器（西元 + 加總法 + 例外 + 雙胞胎時間加總）
 const $=q=>document.querySelector(q);
