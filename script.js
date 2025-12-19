@@ -70,3 +70,13 @@ function render(r){$('#valA').textContent=r.A;$('#valB').textContent=r.B;$('#val
 btnCalc.addEventListener('click',()=>{const date=readDate();if(!date){alert('請輸入您的出生年月日');return}toggleLoading(true);
   setTimeout(()=>{try{const res=computeMaya(date);render(res)}finally{toggleLoading(false)}},240)});
 btnReset.addEventListener('click',()=>{dateAD.value='';result.classList.add('hidden');['A','B','C','D','E'].forEach(k=>{$('#val'+k).textContent='—';$('#sub'+k).textContent='—'})});
+
+
+// v4 scroll fix: force enable scroll on iOS/Android
+document.addEventListener('DOMContentLoaded', () => {
+  const elHtml = document.documentElement;
+  const elBody = document.body;
+  elHtml.style.overflowY = 'auto';
+  elBody.style.overflowY = 'auto';
+  elBody.style.height = 'auto';
+});

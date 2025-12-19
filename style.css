@@ -94,3 +94,40 @@ html, body { height:auto !important; min-height:100% !important; overflow-y:auto
 }
 /* small spacer to ensure page can scroll a bit at bottom */
 body::after{ content:""; display:block; height:40px; }
+
+
+/* --- v4 scroll fix: ensure page scrolls on iOS/Android --- */
+html, body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+/* background must never intercept scroll/touch */
+.bg, #aurora, .stars {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  pointer-events: none !important;
+  touch-action: none !important;
+}
+/* never lock layout to viewport height */
+.wrap, main, .container, .panel {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+/* Bigger image and ensure it doesn't overflow */
+.panel .totem {
+  display: block;
+  margin: 0 auto 18px auto;
+  width: min(92vw, 680px) !important;
+  height: auto !important;
+}
+@media (min-width: 1024px){
+  .panel .totem { width: 680px !important; }
+}
+/* extra bottom space to allow scroll settle */
+body::after { content:""; display:block; height: 80px; }
