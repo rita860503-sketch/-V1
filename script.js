@@ -13,8 +13,7 @@ const calcAlgo = $("#calcAlgo");
 const dateAD = $("#dateAD");
 
 // ROC inputs
-const rocYearInput = $("#rocYear");
-const rocMDDisplay = $("#rocMDDisplay");
+const rocDateDisplay = $("#rocDateDisplay");
 const dateROCValue = $("#dateROCValue");
 
 // Twins
@@ -30,6 +29,8 @@ const rocPicker = $("#rocPicker");
 const rocTitle = $("#rocTitle");
 const rocPrev = $("#rocPrev");
 const rocNext = $("#rocNext");
+const rocYearPrev = $("#rocYearPrev");
+const rocYearNext = $("#rocYearNext");
 const rocToday = $("#rocToday");
 const rocClose = $("#rocClose");
 const rocDays = $("#rocDays");
@@ -51,36 +52,25 @@ calendarMode.addEventListener("change", () => {
 });
 
 function clearROC(){
-  rocYearInput.value = "";
-  rocMDDisplay.value = "";
+  rocDateDisplay.value = "";
   dateROCValue.value = "";
 }
 
-// ---- ROC picker open with smart start month ----
-rocMDDisplay.addEventListener("click", () => {
-  const ry = parseInt(rocYearInput.value, 10);
-  if (!Number.isFinite(ry) || ry < 1 || ry > 200) {
-    alert("請先輸入正確的民國年份（1–200，例如：86）");
-    rocYearInput.focus();
-    return;
-  }
-  const adYear = 1911 + ry;
-  viewYear = adYear;
-
-  let startMonth = 1;
+// ---- ROC picker open: full calendar (year/month/day) ----
+rocDateDisplay.addEventListener("click", () => {
+  // 起始視圖：若有已選日期就用它；否則用「今日」
   const chosen = dateROCValue?.value;
   if (chosen) {
     const d = new Date(chosen);
-    if (!isNaN(d.getTime()) && d.getFullYear() === adYear) {
-      startMonth = d.getMonth() + 1;
+    if (!isNaN(d.getTime())) {
+      viewYear = d.getFullYear();
+      viewMonth = d.getMonth() + 1;
     }
   } else {
-    const today = new Date();
-    if (today.getFullYear() === adYear) {
-      startMonth = today.getMonth() + 1;
-    }
+    const t = new Date();
+    viewYear = t.getFullYear();
+    viewMonth = t.getMonth() + 1;
   }
-  viewMonth = Math.min(12, Math.max(1, startMonth));
   openPicker();
 });
 
@@ -124,18 +114,30 @@ function renderMonth(){
 }
 
 function selectMD(d){
-  const rocY = viewYear - 1911;
-  rocMDDisplay.value = `民國 ${rocY}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}`;
+  const rocY = d.getFullYear() - 1911;
+  rocDateDisplay.value = `民國 ${rocY}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}`;
   dateROCValue.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   closePicker();
 }
 
-// Prev/Next (stay in year)
-rocPrev.addEventListener("click", () => { if (viewMonth === 1) return; viewMonth--; renderMonth(); });
-rocNext.addEventListener("click", () => { if (viewMonth === 12) return; viewMonth++; renderMonth(); });
+// 月份切換（可跨年）
+rocPrev.addEventListener("click", () => {
+  viewMonth--;
+  if (viewMonth < 1){ viewMonth = 12; viewYear--; }
+  renderMonth();
+});
+rocNext.addEventListener("click", () => {
+  viewMonth++;
+  if (viewMonth > 12){ viewMonth = 1; viewYear++; }
+  renderMonth();
+});
+// 年份切換
+rocYearPrev.addEventListener("click", () => { viewYear--; renderMonth(); });
+rocYearNext.addEventListener("click", () => { viewYear++; renderMonth(); });
+// 回到今天
 rocToday.addEventListener("click", () => {
   const t = new Date();
-  if (t.getFullYear() !== viewYear) return;
+  viewYear = t.getFullYear();
   viewMonth = t.getMonth() + 1;
   renderMonth();
 });
@@ -186,7 +188,7 @@ const KEYWORDS = {
 btnCalc.addEventListener("click", () => {
   if (btnCalc.classList.contains("loading")) return;
   const date = readDate();
-  if (!date) { alert("請輸入完整生日（西元或民國年 + 月/日）。"); return; }
+  if (!date) { alert("請輸入完整生日（西元或民國）。"); return; }
   toggleLoading(true);
   setTimeout(() => {
     try{
@@ -204,12 +206,9 @@ function readDate(){
     const d = new Date(v); if(isNaN(d.getTime())) return null;
     return { y:d.getFullYear(), m:d.getMonth()+1, d:d.getDate() };
   } else {
-    const ry = parseInt(rocYearInput.value, 10);
-    if (!Number.isFinite(ry) || ry < 1) return null;
     const v = dateROCValue.value; if(!v) return null;
     const d = new Date(v); if(isNaN(d.getTime())) return null;
-    const adY = 1911 + ry;
-    return { y: adY, m: d.getMonth()+1, d: d.getDate(), roc: ry };
+    return { y: d.getFullYear(), m: d.getMonth()+1, d: d.getDate() };
   }
 }
 
@@ -240,7 +239,6 @@ function computeMaya({ y, m, d }){
     const eight = Number(String(y) + String(m).padStart(2, "0") + String(d).padStart(2, "0")) + hhmm;
     Sum = sumDigits(eight);
   } else {
-    // fallback
     const N = y + m + d + hhmm;
     Sum = sumDigits(N);
   }

@@ -26,6 +26,7 @@
         </select>
       </label>
 
+      <!-- AD：使用原生 date picker -->
       <div id="adInputs" class="row">
         <label>
           <span>西元生日</span>
@@ -33,14 +34,11 @@
         </label>
       </div>
 
+      <!-- ROC：點擊輸入框，彈出完整 ROC 年/月/日 日曆（可跨年） -->
       <div id="rocInputs" class="row hidden">
         <label>
-          <span>民國年份</span>
-          <input type="number" id="rocYear" min="1" max="200" placeholder="例如：86" aria-label="輸入民國年份" />
-        </label>
-        <label>
-          <span>選擇月日</span>
-          <input type="text" id="rocMDDisplay" class="roc-display" placeholder="請先輸入民國年再點此" readonly aria-label="選擇民國月日" />
+          <span>民國生日</span>
+          <input type="text" id="rocDateDisplay" class="roc-display" placeholder="點此選擇民國生日（年/月/日）" readonly aria-label="選擇民國生日" />
           <input type="hidden" id="dateROCValue" />
         </label>
       </div>
@@ -108,13 +106,15 @@
     </section>
   </main>
 
-  <!-- 民國月日選擇器（年固定） -->
+  <!-- ROC 年/月/日 選擇器 -->
   <div id="rocPicker" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="rocTitle">
     <div class="modal-card">
       <div class="modal-header">
+        <button class="icon-btn" id="rocYearPrev" aria-label="上一年">«</button>
         <button class="icon-btn" id="rocPrev" aria-label="上一月">‹</button>
         <div class="title" id="rocTitle">民國 -- 年 -- 月</div>
         <button class="icon-btn" id="rocNext" aria-label="下一月">›</button>
+        <button class="icon-btn" id="rocYearNext" aria-label="下一年">»</button>
       </div>
       <div class="modal-subheader">
         <button class="chip" id="rocToday">今</button>

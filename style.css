@@ -91,3 +91,20 @@ h1{margin:0 0 12px;font-weight:700;letter-spacing:.5px;text-shadow:var(--glow)}
   .cell .value{font-size:56px}
   .cell .sub{font-size:15px}
 }
+
+/* Modal for ROC calendar */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);z-index:50}
+.modal-card{width:min(680px,92vw);background:rgba(10,18,38,.92);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.45);padding:12px}
+.modal-header{display:grid;grid-template-columns: auto auto 1fr auto auto;align-items:center;gap:8px;padding:6px 8px}
+.title{justify-self:center;font-weight:700}
+.icon-btn{padding:6px 10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer}
+.icon-btn:hover{box-shadow:var(--glow)}
+.modal-subheader{display:flex;justify-content:space-between;align-items:center;padding:6px 8px}
+.chip{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer}
+.chip.ghost{background:透明}
+.weekday{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:6px 8px;color:var(--muted)}
+.grid-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:6px 8px}
+.grid-days button{padding:10px 0;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);cursor:pointer}
+.grid-days button.today{outline:2px solid rgba(122,166,255,.9)}
+.grid-days button.muted{opacity:.5}
+.grid-days button:hover{box-shadow:var(--glow)}
