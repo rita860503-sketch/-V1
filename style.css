@@ -9,8 +9,6 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;font-family:"Noto Sans TC",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:var(--text);background:var(--bg);overflow:hidden}
-
-/* 背景：canvas 極光 + 星點 */
 .bg{position:fixed;inset:0;z-index:-2}
 #aurora{width:100%;height:100%;display:block}
 .stars{
@@ -25,7 +23,6 @@ html,body{height:100%;margin:0;font-family:"Noto Sans TC",system-ui,-apple-syste
 }
 @keyframes twinkle { from{opacity:.55} to{opacity:1} }
 
-/* 玻璃面板 */
 .panel{
   position:relative;
   width:min(920px,92vw);
@@ -38,13 +35,10 @@ html,body{height:100%;margin:0;font-family:"Noto Sans TC",system-ui,-apple-syste
   box-shadow: 0 20px 60px rgba(0,0,0,.45);
 }
 h1{margin:0 0 10px;text-align:center;font-weight:900;letter-spacing:.06em;text-shadow:var(--glow)}
-h1 .sub{font-size:.6em;color:var(--muted);font-weight:700}
 
-/* 圖騰 */
-.totem-wrap{display:flex;justify-content:center;margin:6px 0 6px}
-.totem{width:min(280px,60vw);height:auto;filter:drop-shadow(0 0 30px rgba(140,220,255,.3))}
+.totem-wrap{display:flex;justify-content:center;margin:6px 0 10px}
+.totem{width:min(320px,70vw);height:auto;filter:drop-shadow(0 0 30px rgba(140,220,255,.35))}
 
-/* 表單 */
 .form{margin-top:6px}
 .row{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px}
 .field{display:flex;flex-direction:column;gap:6px;min-width:220px;flex:1}
@@ -54,6 +48,7 @@ h1 .sub{font-size:.6em;color:var(--muted);font-weight:700}
   color:var(--text);padding:10px 12px;border-radius:10px;outline:none;
 }
 .field input:focus{border-color:rgba(122,166,255,.6);box-shadow:var(--glow)}
+.hint{color:var(--muted);margin-top:4px}
 
 .actions{justify-content:center;margin-top:4px}
 .btn{min-width:130px;padding:10px 16px;border-radius:12px;border:1px solid var(--border);
@@ -66,7 +61,6 @@ h1 .sub{font-size:.6em;color:var(--muted);font-weight:700}
 @keyframes spin{to{transform:rotate(360deg)}}
 .hidden{display:none !important}
 
-/* 結果卡片 */
 .cards{display:grid;gap:14px;margin-top:16px;grid-template-columns:repeat(2,1fr)}
 .card{
   border:1px solid var(--border);border-radius:18px;background:rgba(255,255,255,.06);
