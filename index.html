@@ -1,129 +1,121 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>瑪雅密碼計算器 Lite</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>瑪雅密碼計算器｜Aurora (西元・加總法)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="sky"><div class="stars"></div><div class="twinkle"></div><div class="sparkles"></div></div>
+  <!-- 動態星空＋極光背景 -->
+  <div class="bg">
+    <canvas id="aurora"></canvas>
+    <div class="stars"></div>
+  </div>
 
-  <main class="container">
-    <h1>瑪雅密碼計算器 <span class="tag">Lite</span></h1>
+  <!-- 玻璃面板 -->
+  <main class="panel">
+    <h1>瑪雅密碼計算器 <small class="sub">（西元｜加總法：年＋月＋日）</small></h1>
 
-    <section class="inputs">
-      <p class="helper">請輸入（或選擇）自己的出生年月日</p>
+    <!-- 圖騰 -->
+    <section class="totem-wrap" aria-label="瑪雅圖騰">
+      <svg class="totem" viewBox="0 0 300 300" aria-hidden="true">
+        <defs>
+          <radialGradient id="g" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stop-color="#9feaff" stop-opacity="1"/>
+            <stop offset="70%" stop-color="#7ad7ff" stop-opacity=".35"/>
+            <stop offset="100%" stop-color="#5ad1ff" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="150" cy="150" r="120" fill="url(#g)" opacity=".25"/>
+        <circle cx="150" cy="150" r="110" fill="none" stroke="#cfe8ff" stroke-width="2" opacity=".7"/>
+        <circle cx="150" cy="150" r="90" fill="none" stroke="#9feaff" stroke-width="2" opacity=".6" stroke-dasharray="8 6"/>
+        <circle cx="150" cy="150" r="70" fill="none" stroke="#7ad7ff" stroke-width="2" opacity=".6"/>
+        <g transform="translate(150,150)">
+          <circle r="34" fill="none" stroke="#e8f3ff" stroke-width="3"/>
+          <path d="M-18 0 a18 18 0 1 0 36 0 a18 18 0 1 0 -36 0z" fill="none" stroke="#e8f3ff" stroke-width="2" opacity=".8"/>
+          <circle r="6" fill="#e8f3ff"/>
+          <path d="M-40 0h80M0 -40v80" stroke="#cfe8ff" stroke-width="2" opacity=".35"/>
+        </g>
+        <!-- 12 刻度 -->
+        <g stroke="#cfe8ff" stroke-width="2" opacity=".55" transform="translate(150,150)">
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(0)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(30)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(60)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(90)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(120)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(150)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(180)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(210)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(240)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(270)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(300)"/>
+          <line x1="0" y1="-110" x2="0" y2="-120" transform="rotate(330)"/>
+        </g>
+      </svg>
+    </section>
 
-      <label class="select">
-        <span>日期格式</span>
-        <select id="calendarMode" aria-label="選擇日期格式">
-          <option value="ad">西元（公曆）</option>
-          <option value="roc">民國</option>
-        </select>
-      </label>
-
-      <!-- AD：使用原生 date picker -->
-      <div id="adInputs" class="row">
-        <label>
+    <!-- 輸入區：僅西元 + 雙胞胎可選 -->
+    <section class="form">
+      <div class="row">
+        <label class="field">
           <span>西元生日</span>
-          <input type="date" id="dateAD" aria-label="選擇西元生日" />
+          <input type="date" id="dateAD" aria-label="選擇西元生日">
         </label>
-      </div>
 
-      <!-- ROC：點擊輸入框，彈出完整 ROC 年/月/日 日曆（可跨年） -->
-      <div id="rocInputs" class="row hidden">
-        <label>
-          <span>民國生日</span>
-          <input type="text" id="rocDateDisplay" class="roc-display" placeholder="點此選擇民國生日（年/月/日）" readonly aria-label="選擇民國生日" />
-          <input type="hidden" id="dateROCValue" />
-        </label>
-      </div>
-
-      <label class="select">
-        <span>D/E 計算法</span>
-        <select id="calcAlgo" aria-label="選擇 D/E 計算方式">
-          <option value="component_sum">加總法（年＋月＋日）</option>
-          <option value="concat_8">八位串接法（YYYYMMDD）</option>
-        </select>
-      </label>
-
-      <div class="advanced">
-        <label class="inline">
+        <label class="field inline">
           <input type="checkbox" id="twinEnable">
-          <span>雙胞胎分流（輸入出生時間讓結果略有差異）</span>
+          <span>雙胞胎分流（輸入出生時間）</span>
         </label>
-        <label class="inline hidden" id="timeWrap">
+
+        <label class="field inline hidden" id="timeWrap">
           <span>出生時間</span>
           <input type="time" id="birthTime" step="60">
         </label>
       </div>
 
-      <div class="actions">
+      <div class="row actions">
         <button id="btnCalc" class="btn">
           <span class="btn-text">開始計算</span>
-          <span class="loader hidden"></span>
+          <span class="loader"></span>
         </button>
         <button id="btnReset" class="btn ghost">清空</button>
       </div>
     </section>
 
-    <section id="result" class="result hidden">
-      <h2 class="sr-only">運算結果</h2>
-
-      <div class="grid">
-        <div class="cell a">
-          <div class="label">前世 (A)</div>
-          <div class="value" id="valA">—</div>
-          <div class="sub" id="subA">—</div>
-        </div>
-        <div class="cell b">
-          <div class="label">今生 (B)</div>
-          <div class="value" id="valB">—</div>
-          <div class="sub" id="subB">—</div>
-        </div>
-        <div class="cell c">
-          <div class="label">潛意識 (C)</div>
-          <div class="value" id="valC">—</div>
-          <div class="sub" id="subC">—</div>
-        </div>
-        <div class="cell d">
-          <div class="label">表象系統 (D)</div>
-          <div class="value" id="valD">—</div>
-          <div class="sub" id="subD">—</div>
-        </div>
-        <div class="cell e">
-          <div class="label">小宇宙 (E)</div>
-          <div class="value" id="valE">—</div>
-          <div class="sub" id="subE">—</div>
-        </div>
+    <!-- 結果區 -->
+    <section id="result" class="cards hidden">
+      <div class="card small">
+        <div class="label">前世（A）</div>
+        <div class="value" id="valA">—</div>
+        <div class="sub" id="subA">—</div>
       </div>
-
-      <p class="done" id="doneMsg">完成計算。</p>
+      <div class="card small">
+        <div class="label">今生（B）</div>
+        <div class="value" id="valB">—</div>
+        <div class="sub" id="subB">—</div>
+      </div>
+      <div class="card large">
+        <div class="label">潛意識（C）</div>
+        <div class="value" id="valC">—</div>
+        <div class="sub" id="subC">—</div>
+      </div>
+      <div class="card full">
+        <div class="label">表象系統（D）</div>
+        <div class="value" id="valD">—</div>
+        <div class="sub" id="subD">—</div>
+      </div>
+      <div class="card full">
+        <div class="label">小宇宙（E）</div>
+        <div class="value" id="valE">—</div>
+        <div class="sub" id="subE">—</div>
+      </div>
+      <div class="done" id="doneMsg">完成計算。</div>
     </section>
   </main>
-
-  <!-- ROC 年/月/日 選擇器 -->
-  <div id="rocPicker" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="rocTitle">
-    <div class="modal-card">
-      <div class="modal-header">
-        <button class="icon-btn" id="rocYearPrev" aria-label="上一年">«</button>
-        <button class="icon-btn" id="rocPrev" aria-label="上一月">‹</button>
-        <div class="title" id="rocTitle">民國 -- 年 -- 月</div>
-        <button class="icon-btn" id="rocNext" aria-label="下一月">›</button>
-        <button class="icon-btn" id="rocYearNext" aria-label="下一年">»</button>
-      </div>
-      <div class="modal-subheader">
-        <button class="chip" id="rocToday">今</button>
-        <button class="chip ghost" id="rocClose">關閉</button>
-      </div>
-      <div class="weekday"><div>日</div><div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div></div>
-      <div class="grid-days" id="rocDays"></div>
-    </div>
-  </div>
 
   <script src="script.js"></script>
 </body>

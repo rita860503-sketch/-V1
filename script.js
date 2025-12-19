@@ -1,281 +1,120 @@
-const $ = (q) => document.querySelector(q);
+// ---------- Aurora Canvas ----------
+const canvas = document.getElementById('aurora');
+const ctx = canvas.getContext('2d');
+function resize(){canvas.width = innerWidth; canvas.height = innerHeight;}
+addEventListener('resize', resize); resize();
 
-// ----- Nodes -----
-const calendarMode = $("#calendarMode");
-const adInputs = $("#adInputs");
-const rocInputs = $("#rocInputs");
-const btnCalc = $("#btnCalc");
-const btnText = btnCalc.querySelector(".btn-text");
-const btnLoader = btnCalc.querySelector(".loader");
-const calcAlgo = $("#calcAlgo");
+let t = 0;
+function drawAurora(){
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
 
-// AD
-const dateAD = $("#dateAD");
+  // 背景漸層
+  const g = ctx.createLinearGradient(0,0,0,h);
+  g.addColorStop(0,'#02040b');
+  g.addColorStop(1,'#0b1530');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,w,h);
 
-// ROC inputs
-const rocDateDisplay = $("#rocDateDisplay");
-const dateROCValue = $("#dateROCValue");
+  // 三條極光帶
+  const bands = [
+    {hue:160, amp:0.25, speed:0.0006, y:0.35},
+    {hue:200, amp:0.20, speed:0.00045, y:0.55},
+    {hue:130, amp:0.18, speed:0.00035, y:0.75},
+  ];
+  bands.forEach((b,i)=>{
+    ctx.save();
+    ctx.globalCompositeOperation='lighter';
+    const grad=ctx.createLinearGradient(0,b.y*h-120,0,b.y*h+120);
+    grad.addColorStop(0,`hsla(${b.hue},80%,70%,0)`);
+    grad.addColorStop(0.45,`hsla(${b.hue+20},90%,70%,.35)`);
+    grad.addColorStop(1,`hsla(${b.hue+40},100%,75%,0)`);
+    ctx.fillStyle=grad;
 
-// Twins
-const twinEnable = $("#twinEnable");
-const timeWrap = $("#timeWrap");
-const birthTime = $("#birthTime");
-twinEnable.addEventListener("change", () => {
-  timeWrap.classList.toggle("hidden", !twinEnable.checked);
-});
-
-// Picker modal
-const rocPicker = $("#rocPicker");
-const rocTitle = $("#rocTitle");
-const rocPrev = $("#rocPrev");
-const rocNext = $("#rocNext");
-const rocYearPrev = $("#rocYearPrev");
-const rocYearNext = $("#rocYearNext");
-const rocToday = $("#rocToday");
-const rocClose = $("#rocClose");
-const rocDays = $("#rocDays");
-
-let viewYear = new Date().getFullYear();
-let viewMonth = new Date().getMonth() + 1;
-
-// ---- Mode switch ----
-calendarMode.addEventListener("change", () => {
-  if (calendarMode.value === "ad") {
-    rocInputs.classList.add("hidden");
-    adInputs.classList.remove("hidden");
-    clearROC();
-  } else {
-    adInputs.classList.add("hidden");
-    rocInputs.classList.remove("hidden");
-    dateAD.value = "";
-  }
-});
-
-function clearROC(){
-  rocDateDisplay.value = "";
-  dateROCValue.value = "";
-}
-
-// ---- ROC picker open: full calendar (year/month/day) ----
-rocDateDisplay.addEventListener("click", () => {
-  // 起始視圖：若有已選日期就用它；否則用「今日」
-  const chosen = dateROCValue?.value;
-  if (chosen) {
-    const d = new Date(chosen);
-    if (!isNaN(d.getTime())) {
-      viewYear = d.getFullYear();
-      viewMonth = d.getMonth() + 1;
+    ctx.beginPath();
+    ctx.moveTo(0, b.y*h + Math.sin(t*b.speed*900)*(b.amp*120));
+    for(let x=0;x<=w;x+=8){
+      const y = b.y*h + Math.sin(t*b.speed*x + i)*b.amp*140 + Math.sin(t*b.speed*2.5*x)*b.amp*60;
+      ctx.lineTo(x,y);
     }
-  } else {
-    const t = new Date();
-    viewYear = t.getFullYear();
-    viewMonth = t.getMonth() + 1;
-  }
-  openPicker();
-});
-
-function openPicker(){ rocPicker.classList.remove("hidden"); renderMonth(); }
-function closePicker(){ rocPicker.classList.add("hidden"); }
-
-function renderMonth(){
-  const rocY = viewYear - 1911;
-  rocTitle.textContent = `民國 ${rocY} 年 ${String(viewMonth).padStart(2,"0")} 月`;
-  const first = new Date(viewYear, viewMonth - 1, 1);
-  const startW = first.getDay();
-  const daysInM = new Date(viewYear, viewMonth, 0).getDate();
-  const prevDays = new Date(viewYear, viewMonth - 1, 0).getDate();
-  rocDays.innerHTML = "";
-  const cells = 42;
-  for (let i=0;i<cells;i++){
-    const btn = document.createElement("button");
-    let dayNum;
-    if (i < startW){
-      dayNum = prevDays - (startW - 1 - i);
-      btn.classList.add("muted");
-      const d = new Date(viewYear, viewMonth - 2, dayNum);
-      btn.textContent = dayNum;
-      btn.addEventListener("click", () => selectMD(d));
-    } else if (i < startW + daysInM){
-      dayNum = i - startW + 1;
-      const d = new Date(viewYear, viewMonth - 1, dayNum);
-      btn.textContent = dayNum;
-      const today = new Date();
-      if (d.toDateString() === today.toDateString()) btn.classList.add("today");
-      btn.addEventListener("click", () => selectMD(d));
-    } else {
-      dayNum = i - (startW + daysInM) + 1;
-      btn.classList.add("muted");
-      const d = new Date(viewYear, viewMonth, dayNum);
-      btn.textContent = dayNum;
-      btn.addEventListener("click", () => selectMD(d));
-    }
-    rocDays.appendChild(btn);
-  }
-}
-
-function selectMD(d){
-  const rocY = d.getFullYear() - 1911;
-  rocDateDisplay.value = `民國 ${rocY}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}`;
-  dateROCValue.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  closePicker();
-}
-
-// 月份切換（可跨年）
-rocPrev.addEventListener("click", () => {
-  viewMonth--;
-  if (viewMonth < 1){ viewMonth = 12; viewYear--; }
-  renderMonth();
-});
-rocNext.addEventListener("click", () => {
-  viewMonth++;
-  if (viewMonth > 12){ viewMonth = 1; viewYear++; }
-  renderMonth();
-});
-// 年份切換
-rocYearPrev.addEventListener("click", () => { viewYear--; renderMonth(); });
-rocYearNext.addEventListener("click", () => { viewYear++; renderMonth(); });
-// 回到今天
-rocToday.addEventListener("click", () => {
-  const t = new Date();
-  viewYear = t.getFullYear();
-  viewMonth = t.getMonth() + 1;
-  renderMonth();
-});
-rocClose.addEventListener("click", closePicker);
-
-// ---- Reset ----
-$("#btnReset").addEventListener("click", () => {
-  dateAD.value = "";
-  clearROC();
-  hideResult();
-});
-
-function hideResult(){
-  ["A","B","C","D","E"].forEach(k=>{
-    document.querySelector("#val"+k).textContent = "—";
-    document.querySelector("#sub"+k).textContent = "—";
+    ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
+    ctx.fill();
+    ctx.restore();
   });
-  $("#doneMsg").textContent = "";
-  $("#result").classList.add("hidden");
+
+  t += 1;
+  requestAnimationFrame(drawAurora);
 }
+drawAurora();
 
-// ---- Loading ----
-function toggleLoading(isLoading){
-  if (isLoading){ btnCalc.classList.add("loading"); btnText.classList.add("hidden"); btnLoader.classList.remove("hidden"); }
-  else { btnCalc.classList.remove("loading"); btnText.classList.remove("hidden"); btnLoader.classList.add("hidden"); }
-}
+// ---------- Calculator (AD + component_sum only) ----------
+const $ = (q)=>document.querySelector(q);
 
-// ---- Math helpers ----
-function sumDigits(n) {
-  const s = String(Math.abs(Number(n) || 0));
-  return [...s].reduce((a, c) => a + (parseInt(c, 10) || 0), 0);
-}
+// nodes
+const dateAD=$("#dateAD");
+const twinEnable=$("#twinEnable"); const timeWrap=$("#timeWrap"); const birthTime=$("#birthTime");
+const btnCalc=$("#btnCalc"); const btnReset=$("#btnReset");
+const result=$("#result");
 
-// %10 digital root mapping for keywords
-function digitalRoot(n) {
-  if (n === "—") return null;
-  const val = Number(n);
-  if (!Number.isFinite(val)) return null;
-  return ((val % 10) + 10) % 10;
-}
-
-const KEYWORDS = {
-  0:"源初", 1:"開創", 2:"合作", 3:"創意", 4:"穩定",
-  5:"變動", 6:"責任", 7:"覺察", 8:"權能", 9:"完成"
-};
-
-// ---- Compute ----
-btnCalc.addEventListener("click", () => {
-  if (btnCalc.classList.contains("loading")) return;
-  const date = readDate();
-  if (!date) { alert("請輸入完整生日（西元或民國）。"); return; }
-  toggleLoading(true);
-  setTimeout(() => {
-    try{
-      const res = computeMaya(date);
-      render(res);
-    } finally {
-      toggleLoading(false);
-    }
-  }, 220);
+twinEnable.addEventListener('change',()=>{
+  timeWrap.classList.toggle('hidden', !twinEnable.checked);
 });
+
+function toggleLoading(on){ btnCalc.classList.toggle('loading',on); }
 
 function readDate(){
-  if (calendarMode.value === "ad"){
-    const v = dateAD.value; if(!v) return null;
-    const d = new Date(v); if(isNaN(d.getTime())) return null;
-    return { y:d.getFullYear(), m:d.getMonth()+1, d:d.getDate() };
-  } else {
-    const v = dateROCValue.value; if(!v) return null;
-    const d = new Date(v); if(isNaN(d.getTime())) return null;
-    return { y: d.getFullYear(), m: d.getMonth()+1, d: d.getDate() };
-  }
+  const v=dateAD.value; if(!v) return null; const d=new Date(v); if(isNaN(d)) return null;
+  return {y:d.getFullYear(), m:d.getMonth()+1, d:d.getDate()};
 }
 
-function getBirthTimeHHMM(){
-  if (!(twinEnable && twinEnable.checked && birthTime && birthTime.value)) return 0;
-  const [hh, mm] = birthTime.value.split(":").map(Number);
-  return (Number.isFinite(hh) ? hh : 0) + (Number.isFinite(mm) ? mm : 0);
+function sumDigits(n){ const s=String(Math.abs(Number(n)||0)); return [...s].reduce((a,c)=>a+(parseInt(c,10)||0),0); }
+function digitalRoot(n){ if(n==='—') return null; const v=Number(n); return ((v%10)+10)%10; }
+const KEYWORDS={0:"源初",1:"開創",2:"合作",3:"創意",4:"穩定",5:"變動",6:"責任",7:"覺察",8:"權能",9:"完成"};
+
+function getHHMM(){ if(!(twinEnable.checked && birthTime.value)) return 0;
+  const [hh,mm]=birthTime.value.split(':').map(Number); return (Number.isFinite(hh)?hh:0)+(Number.isFinite(mm)?0:mm);
 }
 
-function computeMaya({ y, m, d }){
-  // Exception years
-  const isException = (y >= 1910 && y <= 1921) || (y >= 2010 && y <= 2021);
-  const A_raw = Math.floor((y % 100) / 10);
-  const B_raw = y % 10;
-  const C = isException ? 10 : (A_raw + B_raw);
+function computeMaya({y,m,d}){
+  const isException=(y>=1910&&y<=1921)||(y>=2010&&y<=2021);
+  const A_raw=Math.floor((y%100)/10);
+  const B_raw=y%10;
+  const C=isException?10:(A_raw+B_raw);
 
-  // D/E algorithm
-  const algo = (calcAlgo && calcAlgo.value) || "component_sum";
-  const hhmm = getBirthTimeHHMM();
+  // component_sum only: N = Y + M + D (+ HH + MM if twin)
+  const hhmm = getHHMM();
+  const N = y + m + d + hhmm;
+  const Sum = sumDigits(N);
 
-  let Sum;
-  if (algo === "component_sum") {
-    // N = 年 + 月 + 日 + (HH + MM)
-    const N = y + m + d + hhmm;
-    Sum = sumDigits(N);
-  } else if (algo === "concat_8") {
-    // 八位串接：YYYYMMDD 再 + (HH+MM)，最後做位數和
-    const eight = Number(String(y) + String(m).padStart(2, "0") + String(d).padStart(2, "0")) + hhmm;
-    Sum = sumDigits(eight);
-  } else {
-    const N = y + m + d + hhmm;
-    Sum = sumDigits(N);
-  }
+  const D=(Sum<22)?Sum:(Sum-22);
+  const E=(Sum<22)?Sum:sumDigits(Sum);
+  return {A:isException?'—':String(A_raw), B:isException?'—':String(B_raw), C, D, E};
+}
 
-  const D = (Sum < 22) ? Sum : (Sum - 22);
-  const E = (Sum < 22) ? Sum : sumDigits(Sum);
-
-  return {
-    y,m,d,
-    A: isException ? "—" : String(A_raw),
-    B: isException ? "—" : String(B_raw),
-    C, D, E
-  };
+function setSub(id,val){
+  const el=document.querySelector(id);
+  if(val==='—'){ el.textContent='—'; return; }
+  const dr=digitalRoot(val); el.textContent=`${dr}｜${KEYWORDS[dr]||''}`;
 }
 
 function render(r){
-  // main numbers
-  $("#valA").textContent = r.A;
-  $("#valB").textContent = r.B;
-  $("#valC").textContent = r.C;
-  $("#valD").textContent = r.D;
-  $("#valE").textContent = r.E;
-
-  // sub lines
-  const setSub = (id, v) => {
-    const el = document.querySelector(id);
-    if (v === "—"){ el.textContent = "—"; return; }
-    const dr = digitalRoot(v);
-    el.textContent = (dr === null) ? "—" : `${dr} | ${KEYWORDS[dr] ?? ""}`;
-  };
-  setSub("#subA", r.A);
-  setSub("#subB", r.B);
-  setSub("#subC", r.C);
-  setSub("#subD", r.D);
-  setSub("#subE", r.E);
-
-  // Done
-  $("#doneMsg").textContent = "完成計算。";
-  $("#result").classList.remove("hidden");
+  document.querySelector('#valA').textContent=r.A;
+  document.querySelector('#valB').textContent=r.B;
+  document.querySelector('#valC').textContent=r.C;
+  document.querySelector('#valD').textContent=r.D;
+  document.querySelector('#valE').textContent=r.E;
+  setSub('#subA',r.A); setSub('#subB',r.B); setSub('#subC',r.C); setSub('#subD',r.D); setSub('#subE',r.E);
+  document.querySelector('#doneMsg').textContent='完成計算。';
+  result.classList.remove('hidden');
 }
+
+btnCalc.addEventListener('click',()=>{
+  const date=readDate();
+  if(!date){ alert('請選擇西元生日'); return; }
+  toggleLoading(true);
+  setTimeout(()=>{ try{ const res=computeMaya(date); render(res);} finally{ toggleLoading(false);} }, 240);
+});
+btnReset.addEventListener('click',()=>{
+  dateAD.value=''; result.classList.add('hidden');
+  ['A','B','C','D','E'].forEach(k=>{ document.querySelector('#val'+k).textContent='—'; document.querySelector('#sub'+k).textContent='—'; });
+});
