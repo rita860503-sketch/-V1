@@ -57,7 +57,7 @@ h1{margin:0 0 12px;font-weight:700;letter-spacing:.5px;text-shadow:var(--glow)}
 
 .result{margin-top:16px}
 
-/* New layout matching the screenshot */
+/* 結果布局：A/B 上排小卡；C 大卡；D/E 各一卡（滿版） */
 .grid {
   margin-top: 10px;
   display: grid;

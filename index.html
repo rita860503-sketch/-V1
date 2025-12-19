@@ -36,14 +36,22 @@
       <div id="rocInputs" class="row hidden">
         <label>
           <span>民國年份</span>
-          <input type="number" id="rocYear" min="1" max="300" placeholder="例如：86" aria-label="輸入民國年份" />
+          <input type="number" id="rocYear" min="1" max="200" placeholder="例如：86" aria-label="輸入民國年份" />
         </label>
         <label>
-          <span>民國月日</span>
-          <input type="text" id="rocMDDisplay" class="roc-display" placeholder="點此選擇月/日（民國年已輸入）" readonly />
+          <span>選擇月日</span>
+          <input type="text" id="rocMDDisplay" class="roc-display" placeholder="請先輸入民國年再點此" readonly aria-label="選擇民國月日" />
           <input type="hidden" id="dateROCValue" />
         </label>
       </div>
+
+      <label class="select">
+        <span>D/E 計算法</span>
+        <select id="calcAlgo" aria-label="選擇 D/E 計算方式">
+          <option value="component_sum">加總法（年＋月＋日）</option>
+          <option value="concat_8">八位串接法（YYYYMMDD）</option>
+        </select>
+      </label>
 
       <div class="advanced">
         <label class="inline">

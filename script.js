@@ -1,17 +1,18 @@
 const $ = (q) => document.querySelector(q);
 
-// ----- UI nodes -----
+// ----- Nodes -----
 const calendarMode = $("#calendarMode");
 const adInputs = $("#adInputs");
 const rocInputs = $("#rocInputs");
 const btnCalc = $("#btnCalc");
 const btnText = btnCalc.querySelector(".btn-text");
 const btnLoader = btnCalc.querySelector(".loader");
+const calcAlgo = $("#calcAlgo");
 
-// AD input
+// AD
 const dateAD = $("#dateAD");
 
-// ROC input: year + month/day picker
+// ROC inputs
 const rocYearInput = $("#rocYear");
 const rocMDDisplay = $("#rocMDDisplay");
 const dateROCValue = $("#dateROCValue");
@@ -36,7 +37,7 @@ const rocDays = $("#rocDays");
 let viewYear = new Date().getFullYear();
 let viewMonth = new Date().getMonth() + 1;
 
-// Mode switch
+// ---- Mode switch ----
 calendarMode.addEventListener("change", () => {
   if (calendarMode.value === "ad") {
     rocInputs.classList.add("hidden");
@@ -55,13 +56,31 @@ function clearROC(){
   dateROCValue.value = "";
 }
 
-// Click ROC MD input to open picker
+// ---- ROC picker open with smart start month ----
 rocMDDisplay.addEventListener("click", () => {
   const ry = parseInt(rocYearInput.value, 10);
-  if (isNaN(ry) || ry <= 0) { alert("請先輸入民國年份（例如：86）。"); return; }
-  viewYear = 1911 + ry;
-  const base = dateROCValue.value ? new Date(dateROCValue.value) : new Date(viewYear, new Date().getMonth(), 1);
-  viewMonth = base.getMonth() + 1;
+  if (!Number.isFinite(ry) || ry < 1 || ry > 200) {
+    alert("請先輸入正確的民國年份（1–200，例如：86）");
+    rocYearInput.focus();
+    return;
+  }
+  const adYear = 1911 + ry;
+  viewYear = adYear;
+
+  let startMonth = 1;
+  const chosen = dateROCValue?.value;
+  if (chosen) {
+    const d = new Date(chosen);
+    if (!isNaN(d.getTime()) && d.getFullYear() === adYear) {
+      startMonth = d.getMonth() + 1;
+    }
+  } else {
+    const today = new Date();
+    if (today.getFullYear() === adYear) {
+      startMonth = today.getMonth() + 1;
+    }
+  }
+  viewMonth = Math.min(12, Math.max(1, startMonth));
   openPicker();
 });
 
@@ -122,7 +141,7 @@ rocToday.addEventListener("click", () => {
 });
 rocClose.addEventListener("click", closePicker);
 
-// Reset
+// ---- Reset ----
 $("#btnReset").addEventListener("click", () => {
   dateAD.value = "";
   clearROC();
@@ -138,28 +157,32 @@ function hideResult(){
   $("#result").classList.add("hidden");
 }
 
-// Loading
+// ---- Loading ----
 function toggleLoading(isLoading){
   if (isLoading){ btnCalc.classList.add("loading"); btnText.classList.add("hidden"); btnLoader.classList.remove("hidden"); }
   else { btnCalc.classList.remove("loading"); btnText.classList.remove("hidden"); btnLoader.classList.add("hidden"); }
 }
 
-// Digit sum & digital root
-function sumDigits(n){
-  return String(Math.trunc(Number(n))).split("").reduce((a,c)=>a+(isNaN(+c)?0:+c),0);
-}
-function digitalRoot(n){
-  n = Math.abs(parseInt(n,10)||0);
-  while(n>=10){ n = String(n).split("").reduce((a,c)=>a+(+c||0),0); }
-  return n;
+// ---- Math helpers ----
+function sumDigits(n) {
+  const s = String(Math.abs(Number(n) || 0));
+  return [...s].reduce((a, c) => a + (parseInt(c, 10) || 0), 0);
 }
 
-// Keywords 0-9
+// %10 digital root mapping for keywords
+function digitalRoot(n) {
+  if (n === "—") return null;
+  const val = Number(n);
+  if (!Number.isFinite(val)) return null;
+  return ((val % 10) + 10) % 10;
+}
+
 const KEYWORDS = {
-  0:"源初",1:"創始",2:"連結",3:"溝通",4:"結構",5:"變動",6:"責任",7:"覺察",8:"力量",9:"完成"
+  0:"源初", 1:"開創", 2:"合作", 3:"創意", 4:"穩定",
+  5:"變動", 6:"責任", 7:"覺察", 8:"權能", 9:"完成"
 };
 
-// Compute
+// ---- Compute ----
 btnCalc.addEventListener("click", () => {
   if (btnCalc.classList.contains("loading")) return;
   const date = readDate();
@@ -172,7 +195,7 @@ btnCalc.addEventListener("click", () => {
     } finally {
       toggleLoading(false);
     }
-  }, 250);
+  }, 220);
 });
 
 function readDate(){
@@ -182,7 +205,7 @@ function readDate(){
     return { y:d.getFullYear(), m:d.getMonth()+1, d:d.getDate() };
   } else {
     const ry = parseInt(rocYearInput.value, 10);
-    if (isNaN(ry) || ry <= 0) return null;
+    if (!Number.isFinite(ry) || ry < 1) return null;
     const v = dateROCValue.value; if(!v) return null;
     const d = new Date(v); if(isNaN(d.getTime())) return null;
     const adY = 1911 + ry;
@@ -190,24 +213,38 @@ function readDate(){
   }
 }
 
+function getBirthTimeHHMM(){
+  if (!(twinEnable && twinEnable.checked && birthTime && birthTime.value)) return 0;
+  const [hh, mm] = birthTime.value.split(":").map(Number);
+  return (Number.isFinite(hh) ? hh : 0) + (Number.isFinite(mm) ? mm : 0);
+}
+
 function computeMaya({ y, m, d }){
-  // Exceptions
+  // Exception years
   const isException = (y >= 1910 && y <= 1921) || (y >= 2010 && y <= 2021);
   const A_raw = Math.floor((y % 100) / 10);
   const B_raw = y % 10;
   const C = isException ? 10 : (A_raw + B_raw);
 
-  // Twins HH+MM
-  let hhmm = 0;
-  if (twinEnable && twinEnable.checked && birthTime && birthTime.value){
-    const [hh, mm] = birthTime.value.split(":").map(v=>parseInt(v,10));
-    if (!isNaN(hh)) hhmm += hh;
-    if (!isNaN(mm)) hhmm += mm;
+  // D/E algorithm
+  const algo = (calcAlgo && calcAlgo.value) || "component_sum";
+  const hhmm = getBirthTimeHHMM();
+
+  let Sum;
+  if (algo === "component_sum") {
+    // N = 年 + 月 + 日 + (HH + MM)
+    const N = y + m + d + hhmm;
+    Sum = sumDigits(N);
+  } else if (algo === "concat_8") {
+    // 八位串接：YYYYMMDD 再 + (HH+MM)，最後做位數和
+    const eight = Number(String(y) + String(m).padStart(2, "0") + String(d).padStart(2, "0")) + hhmm;
+    Sum = sumDigits(eight);
+  } else {
+    // fallback
+    const N = y + m + d + hhmm;
+    Sum = sumDigits(N);
   }
 
-  // N = Y+M+D+(HH+MM); Sum = digit sum of N
-  const N = y + m + d + hhmm;
-  const Sum = sumDigits(N);
   const D = (Sum < 22) ? Sum : (Sum - 22);
   const E = (Sum < 22) ? Sum : sumDigits(Sum);
 
@@ -220,20 +257,19 @@ function computeMaya({ y, m, d }){
 }
 
 function render(r){
-  // Main numbers
+  // main numbers
   $("#valA").textContent = r.A;
   $("#valB").textContent = r.B;
   $("#valC").textContent = r.C;
   $("#valD").textContent = r.D;
   $("#valE").textContent = r.E;
 
-  // Sub lines
+  // sub lines
   const setSub = (id, v) => {
     const el = document.querySelector(id);
     if (v === "—"){ el.textContent = "—"; return; }
     const dr = digitalRoot(v);
-    const word = KEYWORDS[dr] ?? "";
-    el.textContent = `${dr} | ${word}`;
+    el.textContent = (dr === null) ? "—" : `${dr} | ${KEYWORDS[dr] ?? ""}`;
   };
   setSub("#subA", r.A);
   setSub("#subB", r.B);
