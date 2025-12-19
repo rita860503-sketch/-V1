@@ -1,34 +1,48 @@
-// Aurora canvas
+// 動態極光背景：Canvas + requestAnimationFrame
 const canvas = document.getElementById('aurora');
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d', { alpha: true }); // 透明背景，避免被覆蓋
 function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
-addEventListener('resize',resize);resize();
+addEventListener('resize',resize,{passive:true});resize();
 let t=0;
 function drawAurora(){
   const w=canvas.width,h=canvas.height;
   ctx.clearRect(0,0,w,h);
+  // 深藍色底（淡到透明，保留星空）
   const g=ctx.createLinearGradient(0,0,0,h);
-  g.addColorStop(0,'#02040b'); g.addColorStop(1,'#0b1530');
+  g.addColorStop(0,'rgba(2,4,11,0.9)');
+  g.addColorStop(1,'rgba(11,21,48,0.6)');
   ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-  const bands=[{hue:160,amp:.25,speed:.0006,y:.35},{hue:200,amp:.2,speed:.00045,y:.55},{hue:130,amp:.18,speed:.00035,y:.75}];
-  bands.forEach((b,i)=>{ctx.save();ctx.globalCompositeOperation='lighter';
-    const grad=ctx.createLinearGradient(0,b.y*h-120,0,b.y*h+120);
-    grad.addColorStop(0,`hsla(${b.hue},80%,70%,0)`);
-    grad.addColorStop(.45,`hsla(${b.hue+20},90%,70%,.35)`);
+
+  const bands=[
+    {hue:160,amp:.28,speed:.0007,y:.35,width:140},
+    {hue:200,amp:.22,speed:.0005,y:.55,width:160},
+    {hue:130,amp:.2 ,speed:.0004,y:.75,width:180},
+  ];
+
+  bands.forEach((b,i)=>{
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    const grad=ctx.createLinearGradient(0,b.y*h-b.width,0,b.y*h+b.width);
+    grad.addColorStop(0,`hsla(${b.hue},90%,70%,0)`);
+    grad.addColorStop(.45,`hsla(${b.hue+20},95%,70%,.35)`);
     grad.addColorStop(1,`hsla(${b.hue+40},100%,75%,0)`);
-    ctx.fillStyle=grad; ctx.beginPath();
-    ctx.moveTo(0,b.y*h+Math.sin(t*b.speed*900)*(b.amp*120));
-    for(let x=0;x<=w;x+=8){
-      const y=b.y*h+Math.sin(t*b.speed*x+i)*b.amp*140+Math.sin(t*b.speed*2.5*x)*b.amp*60;
+    ctx.fillStyle=grad;
+    ctx.beginPath();
+    ctx.moveTo(0,b.y*h);
+    for(let x=0;x<=w;x+=6){
+      const y=b.y*h
+        + Math.sin((t*b.speed*900)+x*0.01+i)*b.amp*140
+        + Math.sin((t*b.speed*2.5)+x*0.03)*b.amp*60;
       ctx.lineTo(x,y);
     }
-    ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fill();ctx.restore();
+    ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();
+    ctx.fill(); ctx.restore();
   });
+
   t+=1; requestAnimationFrame(drawAurora);
 }
 drawAurora();
 
-// Calculator (AD + 加總法)
+// 計算器（西元 + 加總法 + 例外 + 雙胞胎時間加總）
 const $=q=>document.querySelector(q);
 const dateAD=$("#dateAD");
 const twinEnable=$("#twinEnable"), timeWrap=$("#timeWrap"), birthTime=$("#birthTime");

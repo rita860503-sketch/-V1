@@ -1,4 +1,4 @@
-/* 極光＋星空＋玻璃面板｜思源黑體 */
+/* Aurora + Stars + Glass panel */
 :root{
   --bg:#020712;
   --glass:rgba(10,18,38,.58);
@@ -9,8 +9,10 @@
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;font-family:"Noto Sans TC",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:var(--text);background:var(--bg);overflow:hidden}
+
+/* 必要：確保看到動畫，而不是一片素色 */
 .bg{position:fixed;inset:0;z-index:-2}
-#aurora{width:100%;height:100%;display:block}
+#aurora{width:100%;height:100%;display:block;background:transparent !important}
 .stars{
   position:absolute;inset:0;pointer-events:none;
   background:
