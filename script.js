@@ -54,7 +54,7 @@ function readDate(){const v=dateAD.value;if(!v)return null;const d=new Date(v);i
 function sumDigits(n){return String(Math.abs(Number(n)||0)).split('').reduce((a,c)=>a+(parseInt(c,10)||0),0)}
 function digitalRoot(n){if(n==='—')return null;const v=Number(n);return((v%10)+10)%10}
 const KEYWORDS={0:"源初",1:"開創",2:"合作",3:"創意",4:"穩定",5:"變動",6:"責任",7:"覺察",8:"權能",9:"完成"};
-function getHHMM(){if(!(twinEnable.checked&&birthTime.value))return 0;const [hh,mm]=birthTime.value.split(':').map(Number);return (Number.isFinite(hh)?hh:0)+(Number.isFinite(mm)?0:mm)}
+function getHHMM(){if(!(twinEnable.checked&&birthTime.value))return 0;const [hh,mm]=birthTime.value.split(':').map(Number);return (Number.isFinite(hh)?hh:0) + (Number.isFinite(mm)?mm:0)}
 function computeMaya({y,m,d}){
   const isException=(y>=1910&&y<=1921)||(y>=2010&&y<=2021);
   const A_raw=Math.floor((y%100)/10), B_raw=y%10;

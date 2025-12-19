@@ -131,3 +131,44 @@ html, body {
 }
 /* extra bottom space to allow scroll settle */
 body::after { content:""; display:block; height: 80px; }
+
+
+/* === v6 final: mobile scroll + layout hardening === */
+html, body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+.bg, #aurora, .stars {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  pointer-events: none !important;
+  touch-action: none !important;
+}
+.wrap, main, .container, .panel {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+* { max-width: 100%; }
+.cards, .row { overflow-x: hidden; }
+@media (max-width: 600px){
+  .cards { grid-template-columns: 1fr !important; }
+  .card.large, .card.full { grid-column: 1 / -1 !important; }
+  .panel { padding-bottom: 36px !important; }
+  .value { font-size: 48px !important; }
+}
+.panel .totem {
+  display: block;
+  margin: 0 auto 18px auto;
+  width: min(92vw, 680px) !important;
+  height: auto !important;
+}
+@media (min-width: 1024px){
+  .panel .totem { width: 680px !important; }
+}
+body::after { content:""; display:block; height: 80px; }
