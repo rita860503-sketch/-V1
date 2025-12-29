@@ -3,96 +3,150 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>瑪雅密碼合盤｜雙方皆支援雙胞胎分流</title>
+  <title>瑪雅密碼計算器 | 個人 / 合盤</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="sky"><div class="stars"></div><div class="twinkle"></div></div>
-  <main class="container">
-    <h1>瑪雅密碼合盤 <span class="sub">（雙方皆支援雙胞胎分流）</span></h1>
+  <div class="bg"></div>
 
-    <section class="panel inputs">
-      <div class="two-col">
-        <div class="card person" id="pA">
-          <h2>你的資料</h2>
-          <label class="row">
-            <span>西元生日</span>
-            <input type="date" id="dateA" aria-label="你的西元生日" />
-          </label>
-          <label class="row inline">
-            <input type="checkbox" id="twinA" />
-            <span>雙胞胎分流（輸入出生時間）</span>
-          </label>
-          <label class="row">
-            <span>出生時間（24h）</span>
-            <input type="time" id="timeA" step="60" disabled />
-          </label>
-        </div>
-
-        <div class="card person" id="pB">
-          <h2>對方資料</h2>
-          <label class="row">
-            <span>西元生日</span>
-            <input type="date" id="dateB" aria-label="對方西元生日" />
-          </label>
-          <label class="row inline">
-            <input type="checkbox" id="twinB" />
-            <span>雙胞胎分流（輸入出生時間）</span>
-          </label>
-          <label class="row">
-            <span>出生時間（24h）</span>
-            <input type="time" id="timeB" step="60" disabled />
-          </label>
-        </div>
+  <main class="wrap">
+    <section class="card">
+      <div class="card-header">
+        <img src="totem.jpg" alt="Totem" class="totem" />
+        <h1 class="title">MAYA CODE CALCULATOR</h1>
       </div>
 
-      <div class="actions">
-        <button id="btnCalc" class="btn primary">
-          <span class="btn-text">開始計算</span>
-          <span class="loader hidden"></span>
-        </button>
-        <button id="btnReset" class="btn ghost">清空</button>
-      </div>
-    </section>
+      <div class="controls">
+        <label class="row">
+          <span>模式</span>
+          <select id="mode">
+            <option value="single">個人</option>
+            <option value="match">合盤</option>
+          </select>
+        </label>
 
-    <section id="result" class="panel hidden">
-      <h2>運算結果</h2>
-      <div class="two-col">
-        <div class="card result-card">
-          <h3>你</h3>
-          <div class="grid">
-            <div class="cell"><div class="label">前世 A</div><div id="A_A" class="value">—</div><div id="A_A_kw" class="kw">—</div></div>
-            <div class="cell"><div class="label">今生 B</div><div id="A_B" class="value">—</div><div id="A_B_kw" class="kw">—</div></div>
-            <div class="cell"><div class="label">潛意識 C</div><div id="A_C" class="value">—</div><div id="A_C_kw" class="kw">—</div></div>
-            <div class="cell"><div class="label">表象系統 D</div><div id="A_D" class="value">—</div><div id="A_D_kw" class="kw">—</div></div>
-            <div class="cell"><div class="label">小宇宙 E</div><div id="A_E" class="value">—</div><div id="A_E_kw" class="kw">—</div></div>
+        <div class="grid two" id="singleInputs">
+          <div class="panel">
+            <h3>本人</h3>
+            <label class="row">
+              <span>西元生日</span>
+              <input type="date" id="dateA" />
+            </label>
+            <label class="row inline">
+              <input type="checkbox" id="twinA" />
+              <span>雙胞胎分流（輸入出生時間）</span>
+            </label>
+            <label class="row time" id="timeWrapA" hidden>
+              <span>出生時間</span>
+              <input type="time" id="timeA" placeholder="09:17" />
+            </label>
           </div>
         </div>
-        <div class="card result-card">
-          <h3>對方</h3>
-          <div class="grid">
-            <div class="cell"><div class="label">前世 A</div><div id="B_A" class="value">—</div><div id="B_A_kw" class="kw">—</div></div>
-            <div class="cell"><div class="label">今生 B</div><div id="B_B" class="value">—</div><div id="B_B_kw" class="kw">—</div></div>
-            <div class="cell"><div class="label">潛意識 C</div><div id="B_C" class="value">—</div><div id="B_C_kw" class="kw">—</div></div>
-            <div class="cell"><div class="label">表象系統 D</div><div id="B_D" class="value">—</div><div id="B_D_kw" class="kw">—</div></div>
-            <div class="cell"><div class="label">小宇宙 E</div><div id="B_E" class="value">—</div><div id="B_E_kw" class="kw">—</div></div>
+
+        <div class="grid two hidden" id="matchInputs">
+          <div class="panel">
+            <h3>本人</h3>
+            <label class="row">
+              <span>西元生日</span>
+              <input type="date" id="dateA2" />
+            </label>
+            <label class="row inline">
+              <input type="checkbox" id="twinA2" />
+              <span>雙胞胎分流（輸入出生時間）</span>
+            </label>
+            <label class="row time" id="timeWrapA2" hidden>
+              <span>出生時間</span>
+              <input type="time" id="timeA2" placeholder="09:17" />
+            </label>
+          </div>
+
+          <div class="panel">
+            <h3>對方</h3>
+            <label class="row">
+              <span>西元生日</span>
+              <input type="date" id="dateB" />
+            </label>
+            <label class="row inline">
+              <input type="checkbox" id="twinB" />
+              <span>雙胞胎分流（輸入出生時間）</span>
+            </label>
+            <label class="row time" id="timeWrapB" hidden>
+              <span>出生時間</span>
+              <input type="time" id="timeB" placeholder="09:18" />
+            </label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="btnCalc" class="btn primary">開始計算</button>
+          <button id="btnReset" class="btn ghost">清空</button>
+        </div>
+      </div>
+
+      <div id="resultSingle" class="result hidden">
+        <h2>運算結果（個人）</h2>
+        <div class="grid five">
+          <div class="cell">
+            <div class="label">前世 (A)</div>
+            <div class="value" id="A1">—</div>
+            <div class="sub" id="A1s">—</div>
+          </div>
+          <div class="cell">
+            <div class="label">今生 (B)</div>
+            <div class="value" id="B1">—</div>
+            <div class="sub" id="B1s">—</div>
+          </div>
+          <div class="cell wide">
+            <div class="label">潛意識 (C)</div>
+            <div class="value" id="C1">—</div>
+            <div class="sub" id="C1s">—</div>
+          </div>
+          <div class="cell">
+            <div class="label">表象系統 (D)</div>
+            <div class="value" id="D1">—</div>
+            <div class="sub" id="D1s">—</div>
+          </div>
+          <div class="cell">
+            <div class="label">小宇宙 (E)</div>
+            <div class="value" id="E1">—</div>
+            <div class="sub" id="E1s">—</div>
           </div>
         </div>
       </div>
 
-      <div class="card hints">
-        <h3>合盤小提示</h3>
-        <ul id="matchHints">
-          <li>觀察雙方的 D / E 是否相近：相近代表表面的行動與小宇宙頻率容易同步。</li>
-          <li>若 C 接近，彼此內在動機容易理解；相差大，適合以明確規則與分工彌補。</li>
-        </ul>
+      <div id="resultMatch" class="result hidden">
+        <h2>運算結果（合盤）</h2>
+        <div class="grid two">
+          <div class="panel">
+            <h3>本人</h3>
+            <div class="grid five">
+              <div class="cell"><div class="label">A</div><div class="value" id="A2r">—</div><div class="sub" id="A2rs">—</div></div>
+              <div class="cell"><div class="label">B</div><div class="value" id="B2r">—</div><div class="sub" id="B2rs">—</div></div>
+              <div class="cell wide"><div class="label">C</div><div class="value" id="C2r">—</div><div class="sub" id="C2rs">—</div></div>
+              <div class="cell"><div class="label">D</div><div class="value" id="D2r">—</div><div class="sub" id="D2rs">—</div></div>
+              <div class="cell"><div class="label">E</div><div class="value" id="E2r">—</div><div class="sub" id="E2rs">—</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>對方</h3>
+            <div class="grid five">
+              <div class="cell"><div class="label">A</div><div class="value" id="A3r">—</div><div class="sub" id="A3rs">—</div></div>
+              <div class="cell"><div class="label">B</div><div class="value" id="B3r">—</div><div class="sub" id="B3rs">—</div></div>
+              <div class="cell wide"><div class="label">C</div><div class="value" id="C3r">—</div><div class="sub" id="C3rs">—</div></div>
+              <div class="cell"><div class="label">D</div><div class="value" id="D3r">—</div><div class="sub" id="D3rs">—</div></div>
+              <div class="cell"><div class="label">E</div><div class="value" id="E3r">—</div><div class="sub" id="E3rs">—</div></div>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
 
+      <p class="hint">＊請輸入您的出生年月日；雙胞胎分流：在加總年+月+日後，再加上出生「時+分」。例外年段 1910–1921 / 2010–2021：A/B 隱藏，C 固定為 10。</p>
+    </section>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>
