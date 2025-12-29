@@ -3,55 +3,54 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>瑪雅密碼計算器｜Aurora</title>
+  <title>瑪雅密碼合盤｜雙方皆支援雙胞胎分流</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="bg">
-    <canvas id="aurora"></canvas>
-    <div class="stars"></div>
-  </div>
+  <div class="sky"><div class="stars"></div><div class="twinkle"></div></div>
+  <main class="container">
+    <h1>瑪雅密碼合盤 <span class="sub">（雙方皆支援雙胞胎分流）</span></h1>
 
-  <main class="panel">
-    <h1>瑪雅密碼計算器</h1>
+    <section class="panel inputs">
+      <div class="two-col">
+        <div class="card person" id="pA">
+          <h2>你的資料</h2>
+          <label class="row">
+            <span>西元生日</span>
+            <input type="date" id="dateA" aria-label="你的西元生日" />
+          </label>
+          <label class="row inline">
+            <input type="checkbox" id="twinA" />
+            <span>雙胞胎分流（輸入出生時間）</span>
+          </label>
+          <label class="row">
+            <span>出生時間（24h）</span>
+            <input type="time" id="timeA" step="60" disabled />
+          </label>
+        </div>
 
-    <section class="totem-wrap">
-      <img class="totem" src="totem_v2.jpg" alt="瑪雅圖騰" />
-    </section>
-
-    <div class="mode-tabs">
-      <button id="tabSingle" class="tab-btn active">單人分析</button>
-      <button id="tabMatch" class="tab-btn">雙人合盤</button>
-    </div>
-
-    <section class="form">
-      <div class="row">
-        <label class="field">
-          <span id="labelDate1">西元生日 (A)</span>
-          <input type="date" id="dateAD" aria-label="生日 A" />
-        </label>
-
-        <label class="field hidden" id="fieldDate2">
-          <span>對方生日 (B)</span>
-          <input type="date" id="dateAD2" aria-label="生日 B" />
-        </label>
-
-        <label class="field inline">
-          <input type="checkbox" id="twinEnable" />
-          <span>雙胞胎分流（僅 A）</span>
-        </label>
-
-        <label class="field inline hidden" id="timeWrap">
-          <span>出生時間</span>
-          <input type="time" id="birthTime" step="60" />
-        </label>
+        <div class="card person" id="pB">
+          <h2>對方資料</h2>
+          <label class="row">
+            <span>西元生日</span>
+            <input type="date" id="dateB" aria-label="對方西元生日" />
+          </label>
+          <label class="row inline">
+            <input type="checkbox" id="twinB" />
+            <span>雙胞胎分流（輸入出生時間）</span>
+          </label>
+          <label class="row">
+            <span>出生時間（24h）</span>
+            <input type="time" id="timeB" step="60" disabled />
+          </label>
+        </div>
       </div>
 
-      <div class="row actions">
-        <button id="btnCalc" class="btn">
+      <div class="actions">
+        <button id="btnCalc" class="btn primary">
           <span class="btn-text">開始計算</span>
           <span class="loader hidden"></span>
         </button>
@@ -59,76 +58,41 @@
       </div>
     </section>
 
-    <section id="result" class="cards hidden">
-      <div class="card small">
-        <div class="label">前世 (A)</div>
-        <div class="value" id="valA">—</div>
-        <div class="sub" id="subA">—</div>
+    <section id="result" class="panel hidden">
+      <h2>運算結果</h2>
+      <div class="two-col">
+        <div class="card result-card">
+          <h3>你</h3>
+          <div class="grid">
+            <div class="cell"><div class="label">前世 A</div><div id="A_A" class="value">—</div><div id="A_A_kw" class="kw">—</div></div>
+            <div class="cell"><div class="label">今生 B</div><div id="A_B" class="value">—</div><div id="A_B_kw" class="kw">—</div></div>
+            <div class="cell"><div class="label">潛意識 C</div><div id="A_C" class="value">—</div><div id="A_C_kw" class="kw">—</div></div>
+            <div class="cell"><div class="label">表象系統 D</div><div id="A_D" class="value">—</div><div id="A_D_kw" class="kw">—</div></div>
+            <div class="cell"><div class="label">小宇宙 E</div><div id="A_E" class="value">—</div><div id="A_E_kw" class="kw">—</div></div>
+          </div>
+        </div>
+        <div class="card result-card">
+          <h3>對方</h3>
+          <div class="grid">
+            <div class="cell"><div class="label">前世 A</div><div id="B_A" class="value">—</div><div id="B_A_kw" class="kw">—</div></div>
+            <div class="cell"><div class="label">今生 B</div><div id="B_B" class="value">—</div><div id="B_B_kw" class="kw">—</div></div>
+            <div class="cell"><div class="label">潛意識 C</div><div id="B_C" class="value">—</div><div id="B_C_kw" class="kw">—</div></div>
+            <div class="cell"><div class="label">表象系統 D</div><div id="B_D" class="value">—</div><div id="B_D_kw" class="kw">—</div></div>
+            <div class="cell"><div class="label">小宇宙 E</div><div id="B_E" class="value">—</div><div id="B_E_kw" class="kw">—</div></div>
+          </div>
+        </div>
       </div>
-      <div class="card small">
-        <div class="label">今生 (B)</div>
-        <div class="value" id="valB">—</div>
-        <div class="sub" id="subB">—</div>
-      </div>
-      <div class="card large">
-        <div class="label">潛意識 (C)</div>
-        <div class="value" id="valC">—</div>
-        <div class="sub" id="subC">—</div>
-      </div>
-      <div class="card full">
-        <div class="label">表象系統 (D)</div>
-        <div class="value" id="valD">—</div>
-        <div class="sub" id="subD">—</div>
-      </div>
-      <div class="card full">
-        <div class="label">小宇宙 (E)</div>
-        <div class="value" id="valE">—</div>
-        <div class="sub" id="subE">—</div>
+
+      <div class="card hints">
+        <h3>合盤小提示</h3>
+        <ul id="matchHints">
+          <li>觀察雙方的 D / E 是否相近：相近代表表面的行動與小宇宙頻率容易同步。</li>
+          <li>若 C 接近，彼此內在動機容易理解；相差大，適合以明確規則與分工彌補。</li>
+        </ul>
       </div>
     </section>
 
-    <section id="matchResult" class="match-container hidden">
-      <div class="match-grid">
-        <div class="p-col">
-          <h3>己方 (A)</h3>
-          <div id="mRes1" class="mini-res"></div>
-        </div>
-        <div class="p-col">
-          <h3>對方 (B)</h3>
-          <div id="mRes2" class="mini-res"></div>
-        </div>
-      </div>
-
-      <div class="match-text">
-        <h4>關係能量解讀</h4>
-        <p id="matchDesc">請點擊「開始計算」以檢視結果。</p>
-      </div>
-
-      <div id="lockedArea" class="locked-box">
-        <div class="lock-icon">🔒</div>
-        <h4>進階合盤指數已鎖定</h4>
-        <p>輸入密碼解鎖「契合度 %」與簡易圖表</p>
-        <div class="unlock-form">
-          <input type="password" id="passInput" placeholder="輸入解鎖密碼" maxlength="6" />
-          <button id="btnUnlock" class="btn small">解鎖</button>
-        </div>
-        <p class="error-msg hidden" id="passError">密碼錯誤</p>
-      </div>
-
-      <div id="unlockedArea" class="unlocked-box hidden">
-        <div class="score-circle">
-          <svg viewBox="0 0 36 36" class="circular-chart">
-            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <path class="circle" id="scorePath" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <text x="18" y="20.35" class="percentage" id="scoreText">0%</text>
-          </svg>
-          <div class="score-label">合盤契合度</div>
-        </div>
-        <div class="chart-bars" id="chartBars"></div>
-      </div>
-    </section>
   </main>
-
   <script src="script.js"></script>
 </body>
 </html>
