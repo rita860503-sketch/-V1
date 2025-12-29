@@ -1,167 +1,230 @@
-// 工具
-const $ = (sel) => document.querySelector(sel);
-const KEYWORDS = {0:"源初",1:"開創",2:"合作",3:"創意",4:"穩定",5:"變動",6:"責任",7:"覺察",8:"權能",9:"完成"};
 
-function sumDigits(n){
-  return String(Math.abs(n)).split("").reduce((a,c)=>a + (parseInt(c,10)||0), 0);
+// --- Aurora background (static gradient) ---
+const canvas = document.getElementById('aurora');
+const ctx = canvas.getContext('2d', { alpha: true });
+function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; paintAurora(); }
+addEventListener('resize', resize, { passive:true });
+function paintAurora(){
+  const w = canvas.width, h = canvas.height;
+  const g = ctx.createRadialGradient(w*0.7, h*0.2, 50, w*0.5, h*0.7, Math.max(w,h));
+  g.addColorStop(0,  'rgba(20, 40, 90, 0.55)');
+  g.addColorStop(0.4,'rgba(12, 28, 64, 0.45)');
+  g.addColorStop(1,  'rgba(4, 10, 22, 0.85)');
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,w,h);
 }
-function digitalRoot(n){
-  if(n==="—") return null;
-  let v = Math.abs(parseInt(n,10));
-  return v % 10;
-}
-function isExceptionYear(y){
-  return (y>=1910 && y<=1921) || (y>=2010 && y<=2021);
-}
-function parseDateValue(inputEl){
-  const v = inputEl.value;
+resize();
+
+// --- Core logic ---
+const KEYWORDS = {0:"源初",1:"開創",2:"合作",3:"創意",4:"穩定",5:"變動",6:"責任",7:"覺察",8:"權能",9:"完成"};
+const $ = q => document.querySelector(q);
+let currentMode = 'single'; // 'single' | 'match'
+
+function readDate(sel){
+  const v = $(sel).value;
   if(!v) return null;
   const d = new Date(v);
-  if(isNaN(d.getTime())) return null;
-  return {y:d.getFullYear(), m:d.getMonth()+1, d:d.getDate()};
+  if(isNaN(d)) return null;
+  return { y: d.getFullYear(), m: d.getMonth()+1, d: d.getDate() };
 }
-function hhmmToOffset(timeEl){
-  const tv = timeEl?.value || "";
-  if(!tv) return 0;
-  const [hh,mm] = tv.split(":").map(x=>parseInt(x,10));
-  const h = Number.isFinite(hh) ? hh : 0;
-  const m = Number.isFinite(mm) ? mm : 0;
-  return h + m;
-}
+function sumDigits(n){ return String(Math.abs(Number(n)||0)).split('').reduce((a,c)=>a+(parseInt(c,10)||0),0); }
+function digitalRoot(n){ if(n==='—') return null; const v = Number(n); return ((v%10)+10)%10; }
 
-// 規則：加總法 (年+月+日 [+ 時 + 分]), Sum取位數和 -> D/E
-function computeMaya(y,m,d, offsetHM = 0){
-  const tens = Math.floor((y%100)/10);
-  const ones = y%10;
+function computeMaya({y,m,d}, timeVal=null){
+  // 例外年段：1910–1921、2010–2021
+  const isException = (y>=1910 && y<=1921) || (y>=2010 && y<=2021);
+  const A_raw = Math.floor((y%100)/10);
+  const B_raw = y % 10;
+  const C = isException ? 10 : (A_raw + B_raw);
 
-  let A="—",B="—",C=10;
-  if(!isExceptionYear(y)){
-    A = String(tens);
-    B = String(ones);
-    C = tens + ones;
+  // 加總法 + 雙胞胎分流時間
+  let N = y + m + d;
+  if(timeVal){
+    const [hh, mm] = timeVal.split(':').map(Number);
+    N += (Number.isFinite(hh)?hh:0) + (Number.isFinite(mm)?mm:0); // 修正 mm 判斷
   }
+  const Sum = sumDigits(N);
+  const D = (Sum < 22) ? Sum : (Sum - 22);
+  const E = (Sum < 22) ? Sum : sumDigits(Sum);
 
-  let total = y + m + d + offsetHM;
-  const Sum = sumDigits(total);
+  return {
+    A: isException ? '—' : String(A_raw),
+    B: isException ? '—' : String(B_raw),
+    C, D, E
+  };
+}
 
-  let D, E;
-  if(Sum < 22){
-    D = Sum;
-    E = Sum;
+// --- 單人結果繪製 ---
+function renderSingle(r){
+  const setV = (id, val) => {
+    const el = $(id), sub = $(id.replace('val','sub'));
+    if(val==='—'){ el.textContent='—'; sub.textContent='—'; return; }
+    const dr = digitalRoot(val);
+    el.textContent = val;
+    sub.textContent = `${dr}｜${KEYWORDS[dr]}`;
+  };
+  setV('#valA', r.A);
+  setV('#valB', r.B);
+  setV('#valC', r.C);
+  setV('#valD', r.D);
+  setV('#valE', r.E);
+
+  $('#result').classList.remove('hidden');
+  $('#matchResult').classList.add('hidden');
+}
+
+// --- 合盤結果繪製 ---
+function renderMatch(r1, r2){
+  $('#result').classList.add('hidden');
+  $('#matchResult').classList.remove('hidden');
+
+  const mini = r => {
+    const fmt = (k, v) => `${k}: ${v}${v!=='—' ? ' ('+KEYWORDS[digitalRoot(v)]+')' : ''}`;
+    return `${fmt('A', r.A)}\n${fmt('B', r.B)}\n${fmt('C', r.C)}\n${fmt('D', r.D)}\n${fmt('E', r.E)}`;
+  };
+  $('#mRes1').textContent = mini(r1);
+  $('#mRes2').textContent = mini(r2);
+
+  let notes = [];
+  if(r1.A===r2.A && r1.B===r2.B){
+    notes.push('★ 深層共鳴：雙方前世與今生頻率一致，價值觀底層極為契合。');
+  } else if (digitalRoot(r1.C) === digitalRoot(r2.C)){
+    notes.push('★ 潛意識默契：對事物的直覺反應與內在需求高度相似。');
+  }
+  const d1 = digitalRoot(r1.D), d2 = digitalRoot(r2.D);
+  const isDyn = n => [1,3,5].includes(n);
+  const isStb = n => [4,6,8].includes(n);
+  if( (isDyn(d1) && isStb(d2)) || (isStb(d1) && isDyn(d2)) ){
+    notes.push('★ 動靜互補：一方偏開創變動，另一方偏穩定結構，是良好合作組合。');
+  } else if (d1===d2){
+    notes.push('★ 同頻共振：表象模式相同，溝通零時差，但需注意盲點一致。');
+  }
+  if( ((d1===7||d1===9) && d2===5) || ((d2===7||d2===9) && d1===5) ){
+    notes.push('⚠️ 節奏磨合：一方重深思與完美(7/9)，一方追求速度與自由(5)，需互相包容。');
+  }
+  if(notes.length===0) notes.push('雙方能量平穩，可解鎖進階指數查看更深層互動。');
+  $('#matchDesc').innerHTML = notes.join('<br><br>');
+
+  // reset lock UI
+  $('#lockedArea').classList.remove('hidden');
+  $('#unlockedArea').classList.add('hidden');
+  $('#passError').classList.add('hidden');
+  $('#passInput').value = '';
+}
+
+// 指數與圖表（解鎖後）
+function calculateScore(r1, r2){
+  let score = 60;
+  const root = v => v==='—' ? -1 : digitalRoot(v);
+  ['A','B','C','D','E'].forEach(k => {
+    if(r1[k]!=='—' && r1[k] == r2[k]) score += 6;
+    else if(root(r1[k]) === root(r2[k])) score += 3;
+  });
+  const d1 = root(r1.D), d2 = root(r2.D);
+  if((d1%2)!==(d2%2)) score += 5;
+  return Math.min(100, score);
+}
+function drawCharts(){
+  const container = $('#chartBars');
+  container.innerHTML = '';
+  const metrics = [
+    {label: '溝通', v: 70 + Math.random()*25},
+    {label: '價值', v: 65 + Math.random()*30},
+    {label: '熱情', v: 60 + Math.random()*35},
+  ];
+  metrics.forEach(m => {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = '<div class="bar-label">'+m.label+'</div><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>';
+    container.appendChild(row);
+    setTimeout(() => { row.querySelector('.bar-fill').style.width = m.v + '%'; }, 120);
+  });
+}
+
+// tabs
+function setMode(m){
+  currentMode = m;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  (m==='single' ? $('#tabSingle') : $('#tabMatch')).classList.add('active');
+  if(m==='single'){
+    $('#fieldDate2').classList.add('hidden');
+    $('#labelDate1').textContent = '西元生日 (A)';
+    $('#matchResult').classList.add('hidden');
+    if($('#valA').textContent !== '—') $('#result').classList.remove('hidden');
   }else{
-    D = Sum - 22;
-    E = sumDigits(Sum);
+    $('#fieldDate2').classList.remove('hidden');
+    $('#labelDate1').textContent = '己方生日 (A)';
+    $('#result').classList.add('hidden');
+    if($('#mRes1').textContent) $('#matchResult').classList.remove('hidden');
   }
-  return {A,B,C,D,E};
+}
+$('#tabSingle').addEventListener('click', () => setMode('single'));
+$('#tabMatch').addEventListener('click', () => setMode('match'));
+
+// twin toggle
+$('#twinEnable').addEventListener('change', () => {
+  $('#timeWrap').classList.toggle('hidden', !$('#twinEnable').checked);
+});
+
+// button actions
+const btnCalc = $('#btnCalc');
+function toggleLoading(is){
+  const l=document.querySelector('.loader');
+  if(is){ btnCalc.classList.add('loading'); l.classList.remove('hidden'); }
+  else { btnCalc.classList.remove('loading'); l.classList.add('hidden'); }
 }
 
-// 渲染
-function fillSet(prefix, r){
-  const keys = ["A","B","C","D","E"];
-  keys.forEach(k=>{
-    const val = r[k];
-    $(`#${prefix}${k}`).textContent = val;
-    const subEl = $(`#${prefix}${k}s`);
-    if(subEl){
-      if(val==="—"){
-        subEl.textContent = "—";
+btnCalc.addEventListener('click', () => {
+  const d1 = readDate('#dateAD');
+  if(!d1){ alert('請輸入日期'); return; }
+  toggleLoading(true);
+  setTimeout(() => {
+    try{
+      const tV = $('#twinEnable').checked ? $('#birthTime').value : null;
+      const r1 = computeMaya(d1, tV);
+      if(currentMode==='single'){
+        renderSingle(r1);
       }else{
-        const dr = digitalRoot(val);
-        subEl.textContent = `${dr}｜${KEYWORDS[dr]}`;
+        const d2 = readDate('#dateAD2');
+        if(!d2){ alert('請輸入對方日期'); return; }
+        const r2 = computeMaya(d2, null); // B 方也可再加入時間
+        renderMatch(r1, r2);
       }
+    } finally{
+      toggleLoading(false);
     }
-  });
-}
-
-// 互動控制
-const modeSel = $("#mode");
-const singleInputs = $("#singleInputs");
-const matchInputs = $("#matchInputs");
-const resultSingle = $("#resultSingle");
-const resultMatch = $("#resultMatch");
-
-modeSel.addEventListener("change", () => {
-  const m = modeSel.value;
-  singleInputs.classList.toggle("hidden", m!=="single");
-  matchInputs.classList.toggle("hidden", m!=="match");
-
-  resultSingle.classList.add("hidden");
-  resultMatch.classList.add("hidden");
+  }, 200);
 });
 
-// Twin toggles
-function attachTwinToggle(checkEl, wrapEl){
-  checkEl.addEventListener("change", ()=>{
-    wrapEl.hidden = !checkEl.checked;
-  });
-}
-attachTwinToggle($("#twinA"), $("#timeWrapA"));
-attachTwinToggle($("#twinA2"), $("#timeWrapA2"));
-attachTwinToggle($("#twinB"), $("#timeWrapB"));
-
-// 清空
-$("#btnReset").addEventListener("click", ()=>{
-  ["dateA","dateA2","dateB","timeA","timeA2","timeB"].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.value = "";
-  });
-  ["twinA","twinA2","twinB"].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.checked = false;
-  });
-  $("#timeWrapA").hidden = true;
-  $("#timeWrapA2").hidden = true;
-  $("#timeWrapB").hidden = true;
-  resultSingle.classList.add("hidden");
-  resultMatch.classList.add("hidden");
+$('#btnReset').addEventListener('click', () => {
+  ['#dateAD','#dateAD2','#birthTime','#passInput'].forEach(s => { const el=$(s); if(el) el.value=''; });
+  ['A','B','C','D','E'].forEach(k=>{$('#val'+k).textContent='—';$('#sub'+k).textContent='—'});
+  $('#result').classList.add('hidden');
+  $('#matchResult').classList.add('hidden');
+  $('#twinEnable').checked = false; $('#timeWrap').classList.add('hidden');
 });
 
-// 計算
-$("#btnCalc").addEventListener("click", ()=>{
-  if(modeSel.value === "single"){
-    const dA = parseDateValue($("#dateA"));
-    if(!dA){ alert("請輸入西元生日（本人）"); return; }
-    const offA = $("#twinA").checked ? hhmmToOffset($("#timeA")) : 0;
-    const rA = computeMaya(dA.y, dA.m, dA.d, offA);
-    fillSet("", {A:rA.A,B:rA.B,C:rA.C,D:rA.D,E:rA.E}); // unused
-    // 單人區塊的 id 接尾碼 1
-    fillSet("", {}); // no-op
-    $("#A1").textContent = rA.A;
-    $("#B1").textContent = rA.B;
-    $("#C1").textContent = rA.C;
-    $("#D1").textContent = rA.D;
-    $("#E1").textContent = rA.E;
-    const map = {A:"A1s",B:"B1s",C:"C1s",D:"D1s",E:"E1s"};
-    Object.entries({A:rA.A,B:rA.B,C:rA.C,D:rA.D,E:rA.E}).forEach(([k,v]) => {
-      const el = document.getElementById(map[k]);
-      if(v==="—"){ el.textContent = "—"; }
-      else { const dr = digitalRoot(v); el.textContent = `${dr}｜${KEYWORDS[dr]}`; }
-    });
-    resultSingle.classList.remove("hidden");
-    resultMatch.classList.add("hidden");
+// unlock
+$('#btnUnlock').addEventListener('click', () => {
+  const pass = $('#passInput').value;
+  if(pass === '123456'){
+    $('#lockedArea').classList.add('hidden');
+    $('#unlockedArea').classList.remove('hidden');
+    const d1 = readDate('#dateAD');
+    const d2 = readDate('#dateAD2');
+    const tV = $('#twinEnable').checked ? $('#birthTime').value : null;
+    const r1 = computeMaya(d1, tV);
+    const r2 = computeMaya(d2, null);
+    const score = calculateScore(r1, r2);
+
+    const circle = $('#scorePath'); const text = $('#scoreText');
+    circle.style.strokeDasharray = score + ', 100';
+    let s=0; const it = setInterval(()=>{ s++; text.textContent=s+'%'; if(s>=score) clearInterval(it); }, 10);
+
+    drawCharts();
+    $('#passError').classList.add('hidden');
   }else{
-    const dA = parseDateValue($("#dateA2"));
-    const dB = parseDateValue($("#dateB"));
-    if(!dA || !dB){ alert("請輸入西元生日（本人與對方）"); return; }
-    const offA = $("#twinA2").checked ? hhmmToOffset($("#timeA2")) : 0;
-    const offB = $("#twinB").checked ? hhmmToOffset($("#timeB")) : 0;
-    const rA = computeMaya(dA.y, dA.m, dA.d, offA);
-    const rB = computeMaya(dB.y, dB.m, dB.d, offB);
-
-    // 本人結果
-    $("#A2r").textContent = rA.A; $("#B2r").textContent = rA.B; $("#C2r").textContent = rA.C; $("#D2r").textContent = rA.D; $("#E2r").textContent = rA.E;
-    [["A2rs",rA.A],["B2rs",rA.B],["C2rs",rA.C],["D2rs",rA.D],["E2rs",rA.E]].forEach(([id,v])=>{
-      const el = document.getElementById(id);
-      if(v==="—") el.textContent="—"; else { const dr = digitalRoot(v); el.textContent = `${dr}｜${KEYWORDS[dr]}`; }
-    });
-    // 對方結果
-    $("#A3r").textContent = rB.A; $("#B3r").textContent = rB.B; $("#C3r").textContent = rB.C; $("#D3r").textContent = rB.D; $("#E3r").textContent = rB.E;
-    [["A3rs",rB.A],["B3rs",rB.B],["C3rs",rB.C],["D3rs",rB.D],["E3rs",rB.E]].forEach(([id,v])=>{
-      const el = document.getElementById(id);
-      if(v==="—") el.textContent="—"; else { const dr = digitalRoot(v); el.textContent = `${dr}｜${KEYWORDS[dr]}`; }
-    });
-
-    resultSingle.classList.add("hidden");
-    resultMatch.classList.remove("hidden");
+    $('#passError').classList.remove('hidden');
   }
 });
